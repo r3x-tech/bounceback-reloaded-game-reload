@@ -47,8 +47,8 @@ class StartScene extends Phaser.Scene {
     this.add
       .text(
         leftAlignX,
-        directionsY + 40,
-        "Click to jump & bounce back off non-red \nwall spots to score & earn points",
+        directionsY + 50,
+        "Click right of ball to jump right or click \nleft of ball to jump left & bounce back off \nnon-red wall spots to score & earn points",
         {
           fontSize: 14,
           color: "#ffffff",
