@@ -8,6 +8,7 @@ import { SolanaProvider } from "@/contexts/SolanaProvider";
 import { Toaster } from "react-hot-toast";
 import Router from "next/router";
 import withGA from "next-ga";
+import { Analytics } from "@vercel/analytics/react";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,8 @@ function App({ Component, pageProps }: AppProps) {
         <ChakraProvider theme={theme}>
           <QueryClientProvider client={queryClient}>
             <Component {...pageProps} />
+            <Analytics />
+
             <Toaster />
           </QueryClientProvider>
         </ChakraProvider>
