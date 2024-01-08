@@ -8,7 +8,7 @@ export const saveHighScore = async (currentScore: number) => {
   if (walletAddress && walletAddress.trim() !== "") {
     // Fetch the current scores for the user
     const { data, error } = await supabase
-      .from("reload_bounceback_players")
+      .from("reload_bouncebackreloaded_players")
       .select("saved_scores")
       .eq("solana_wallet_address", walletAddress);
 
@@ -17,7 +17,7 @@ export const saveHighScore = async (currentScore: number) => {
     // If the user doesn't exist, add a new row
     if (data.length === 0) {
       const { error: insertError } = await supabase
-        .from("reload_bounceback_players")
+        .from("reload_bouncebackreloaded_players")
         .insert([
           {
             solana_wallet_address: walletAddress,
@@ -37,7 +37,7 @@ export const saveHighScore = async (currentScore: number) => {
 
         // Update scores in database
         const { error: updateError } = await supabase
-          .from("reload_bounceback_players")
+          .from("reload_bouncebackreloaded_players")
           .update({ saved_scores: scores }) // Update scores array
           .eq("solana_wallet_address", walletAddress); // Where clause
 

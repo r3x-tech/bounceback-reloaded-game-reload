@@ -9,7 +9,7 @@ export interface Score {
 export const getLeaderboard = async (): Promise<Score[]> => {
   // Get all players, their scores and wallet addresses
   const { data, error } = await supabase
-    .from("reload_bounceback_players")
+    .from("reload_bouncebackreloaded_players")
     .select("username, saved_scores, solana_wallet_address");
 
   if (error) {

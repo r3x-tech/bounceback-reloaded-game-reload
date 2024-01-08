@@ -5,7 +5,7 @@ export const getPlayersByWalletAddress = async (
 ) => {
   try {
     const { data, error } = await supabase
-      .from("reload_bounceback_players")
+      .from("reload_bouncebackreloaded_players")
       .select("*")
       .eq("solana_wallet_address", solana_wallet_address)
       .single();
@@ -31,7 +31,7 @@ export const insertPlayerEntry = async (
 ) => {
   try {
     const { data, error } = await supabase
-      .from("reload_bounceback_players")
+      .from("reload_bouncebackreloaded_players")
       .insert([
         {
           username: username,
