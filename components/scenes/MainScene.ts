@@ -169,9 +169,23 @@ export default class MainScene extends Phaser.Scene {
     });
   }
 
-  flap() {
+  flap(pointer: Phaser.Input.Pointer) {
     if (this.ball.body) {
+      // Move up
       this.ball.setVelocityY(-350);
+
+      // Determine tap position relative to the ball
+      const tapPosition = pointer.x;
+      const ballPosition = this.ball.x;
+
+      // Move to the right if tapped on the left of the ball, and to the left if tapped on the right of the ball
+      if (tapPosition < ballPosition) {
+        // Ensure positive velocity to move right
+        this.ball.setVelocityX(Math.abs(this.ballVelocityX));
+      } else {
+        // Ensure negative velocity to move left
+        this.ball.setVelocityX(-Math.abs(this.ballVelocityX));
+      }
     }
   }
 
