@@ -133,25 +133,24 @@ export default class MainScene extends Phaser.Scene {
   setupLevel() {
     const minY = 55;
     const maxY = 295;
-
-    // Level 2: One barrier on the left
     if (this.level === 2) {
       this.createBarrier(5, Phaser.Math.Between(minY, maxY));
-    }
-
-    // Level 3: Add one barrier on the right
-    else if (this.level === 3) {
+    } else if (this.level === 3) {
       this.createBarrier(355, Phaser.Math.Between(minY, maxY));
-    }
-
-    // Level 4: Add second barrier on the left
-    else if (this.level === 4) {
+    } else if (this.level === 4) {
       this.createBarrier(5, Phaser.Math.Between(minY, maxY));
-    }
-
-    // Level 5: Add second barrier on the right
-    else if (this.level === 5) {
+    } else if (this.level === 5) {
       this.createBarrier(355, Phaser.Math.Between(minY, maxY));
+    } else if (this.level === 6) {
+      this.createBarrier(5, Phaser.Math.Between(minY, maxY));
+    } else if (this.level === 7) {
+      this.createBarrier(355, Phaser.Math.Between(minY, maxY));
+    } else if (this.level === 8) {
+      this.createBarrier(5, Phaser.Math.Between(minY, maxY));
+    } else if (this.level === 9) {
+      this.createBarrier(355, Phaser.Math.Between(minY, maxY));
+    } else if (this.level === 10) {
+      this.createBarrier(5, Phaser.Math.Between(minY, maxY));
     }
   }
 
