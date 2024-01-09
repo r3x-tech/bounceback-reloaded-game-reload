@@ -14,8 +14,10 @@ export default class MainScene extends Phaser.Scene {
   private gameOver: boolean = false;
   private paused: boolean = false;
   private pauseButton!: Phaser.GameObjects.Image;
-  private leftBarriers: Phaser.Physics.Arcade.Sprite[] = [];
-  private rightBarriers: Phaser.Physics.Arcade.Sprite[] = [];
+  // private leftBarriers: Phaser.Physics.Arcade.Sprite[] = [];
+  // private rightBarriers: Phaser.Physics.Arcade.Sprite[] = [];
+  private lastWallHit: "left" | "right" | null = null;
+  private canIncrementScore: boolean = true;
 
   constructor(ballImage: string, barrierImage: string) {
     super({ key: "MainScene" });
@@ -130,27 +132,19 @@ export default class MainScene extends Phaser.Scene {
       this.pauseButton.setTexture("pause");
     }
   }
+
   setupLevel() {
     const minY = 55;
     const maxY = 295;
-    if (this.level === 2) {
-      this.createBarrier(5, Phaser.Math.Between(minY, maxY));
-    } else if (this.level === 3) {
-      this.createBarrier(355, Phaser.Math.Between(minY, maxY));
-    } else if (this.level === 4) {
-      this.createBarrier(5, Phaser.Math.Between(minY, maxY));
-    } else if (this.level === 5) {
-      this.createBarrier(355, Phaser.Math.Between(minY, maxY));
-    } else if (this.level === 6) {
-      this.createBarrier(5, Phaser.Math.Between(minY, maxY));
-    } else if (this.level === 7) {
-      this.createBarrier(355, Phaser.Math.Between(minY, maxY));
-    } else if (this.level === 8) {
-      this.createBarrier(5, Phaser.Math.Between(minY, maxY));
-    } else if (this.level === 9) {
-      this.createBarrier(355, Phaser.Math.Between(minY, maxY));
-    } else if (this.level === 10) {
-      this.createBarrier(5, Phaser.Math.Between(minY, maxY));
+
+    // Start adding barriers from level 2 onwards
+    if (this.level >= 2) {
+      // Determine the side for the barrier
+      // Level 2 -> left, Level 3 -> right, and so on
+      const isLeftSide = this.level % 2 === 0;
+      const xPosition = isLeftSide ? 5 : 355;
+
+      this.createBarrier(xPosition, Phaser.Math.Between(minY, maxY));
     }
   }
 
@@ -166,26 +160,6 @@ export default class MainScene extends Phaser.Scene {
         this.endGame();
       });
     });
-  }
-
-  flap(pointer: Phaser.Input.Pointer) {
-    if (this.ball.body) {
-      // Move up
-      this.ball.setVelocityY(-350);
-
-      // Determine tap position relative to the ball
-      const tapPosition = pointer.x;
-      const ballPosition = this.ball.x;
-
-      // Move to the right if tapped on the left of the ball, and to the left if tapped on the right of the ball
-      if (tapPosition < ballPosition) {
-        // Ensure positive velocity to move right
-        this.ball.setVelocityX(Math.abs(this.ballVelocityX));
-      } else {
-        // Ensure negative velocity to move left
-        this.ball.setVelocityX(-Math.abs(this.ballVelocityX));
-      }
-    }
   }
 
   handleBarrierCollision(
@@ -205,18 +179,22 @@ export default class MainScene extends Phaser.Scene {
     right: boolean
   ) {
     // Increment score and change direction when hitting left or right walls
-    if ((left || right) && !this.gameOver) {
-      this.score += 1;
-      this.scoreValueText.setText(`${this.score}`);
+    if (!this.gameOver && (left || right)) {
+      if (this.canIncrementScore) {
+        this.score += 1;
+        this.scoreValueText.setText(`${this.score}`);
+        this.canIncrementScore = false; // Reset the flag after incrementing the score
+
+        // Increase the level every three scores
+        if (this.score % 3 === 0) {
+          this.level++;
+          this.levelValueText.setText(`${this.level}`);
+          this.setupLevel();
+        }
+      }
 
       this.ballVelocityX *= -1;
       this.ball.setVelocityX(this.ballVelocityX);
-
-      if (this.score % 2 === 0) {
-        this.level = Math.min(this.level + 1, 5);
-        this.levelValueText.setText(`${this.level}`);
-        this.setupLevel();
-      }
     }
 
     console.log("World bounds collision: ", { up, down, left, right });
@@ -224,6 +202,27 @@ export default class MainScene extends Phaser.Scene {
     // End the game only if the ball touches the top or bottom bounds
     if ((up || down) && !this.gameOver) {
       this.endGame();
+    }
+  }
+
+  flap(pointer: Phaser.Input.Pointer) {
+    if (this.ball.body) {
+      // Move up
+      this.ball.setVelocityY(-350);
+
+      // Determine tap position relative to the ball
+      const tapPosition = pointer.x;
+      const ballPosition = this.ball.x;
+
+      // Move to the right if tapped on the left of the ball, and to the left if tapped on the right of the ball
+      if (tapPosition < ballPosition) {
+        // Ensure positive velocity to move right
+        this.ball.setVelocityX(Math.abs(this.ballVelocityX));
+      } else {
+        // Ensure negative velocity to move left
+        this.ball.setVelocityX(-Math.abs(this.ballVelocityX));
+      }
+      this.canIncrementScore = true; // Allow score increment on next collision
     }
   }
 
