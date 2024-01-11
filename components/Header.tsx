@@ -94,7 +94,7 @@ const Header = ({
             mt="2px"
             py={3}
             px={5}
-            style={{ marginRight: "-92px" }}
+            style={{ marginRight: "-9px" }}
           >
             <PopoverCloseButton
               position="absolute"

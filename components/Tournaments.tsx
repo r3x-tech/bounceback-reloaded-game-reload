@@ -277,9 +277,9 @@ export function Tournaments() {
             align="center"
             bg={theme.colors.input}
             w="100%"
-            h="100%"
+            h="11.25rem"
             my="0.75rem"
-            px="0.75rem"
+            p="0.75rem"
             borderRadius="2px"
             flex={5}
           >
@@ -310,7 +310,7 @@ export function Tournaments() {
 
             <List
               width="100%"
-              h="8.25rem"
+              h="100%"
               justifyContent="space-between"
               overflowY="auto"
             >
@@ -356,30 +356,155 @@ export function Tournaments() {
                     0
                   </Text>
                 </Flex>
+                <Flex h="2rem" align="center" justifyContent="space-between">
+                  <Flex align="center">
+                    {" "}
+                    <Text
+                      fontSize="0.7rem"
+                      fontWeight="800"
+                      color={theme.colors.primary}
+                      mr="0.5rem"
+                    >
+                      1.
+                      {/* {`${tournament.creator}`} */}
+                    </Text>
+                    <Box alignItems="center" mr="0.5rem">
+                      <Image
+                        src={"/assets/ball.png"}
+                        alt="Default ball image"
+                        width={25}
+                        height={25}
+                        style={{ borderRadius: "50%" }}
+                      />
+                    </Box>
+                    <Text
+                      fontSize="0.7rem"
+                      fontWeight="800"
+                      color={theme.colors.primary}
+                      mr="0.5rem"
+                    >
+                      ...
+                      {/* {`${tournament.creator}`} */}
+                    </Text>
+                  </Flex>
+                  <Text
+                    fontSize="0.7rem"
+                    fontWeight="500"
+                    fontStyle="italic"
+                    color={theme.colors.primary}
+                    mr="0.5rem"
+                  >
+                    0
+                  </Text>
+                </Flex>
+                <Flex h="2rem" align="center" justifyContent="space-between">
+                  <Flex align="center">
+                    {" "}
+                    <Text
+                      fontSize="0.7rem"
+                      fontWeight="800"
+                      color={theme.colors.primary}
+                      mr="0.5rem"
+                    >
+                      1.
+                      {/* {`${tournament.creator}`} */}
+                    </Text>
+                    <Box alignItems="center" mr="0.5rem">
+                      <Image
+                        src={"/assets/ball.png"}
+                        alt="Default ball image"
+                        width={25}
+                        height={25}
+                        style={{ borderRadius: "50%" }}
+                      />
+                    </Box>
+                    <Text
+                      fontSize="0.7rem"
+                      fontWeight="800"
+                      color={theme.colors.primary}
+                      mr="0.5rem"
+                    >
+                      ...
+                      {/* {`${tournament.creator}`} */}
+                    </Text>
+                  </Flex>
+                  <Text
+                    fontSize="0.7rem"
+                    fontWeight="500"
+                    fontStyle="italic"
+                    color={theme.colors.primary}
+                    mr="0.5rem"
+                  >
+                    0
+                  </Text>
+                </Flex>
+                <Flex h="2rem" align="center" justifyContent="space-between">
+                  <Flex align="center">
+                    {" "}
+                    <Text
+                      fontSize="0.7rem"
+                      fontWeight="800"
+                      color={theme.colors.primary}
+                      mr="0.5rem"
+                    >
+                      1.
+                      {/* {`${tournament.creator}`} */}
+                    </Text>
+                    <Box alignItems="center" mr="0.5rem">
+                      <Image
+                        src={"/assets/ball.png"}
+                        alt="Default ball image"
+                        width={25}
+                        height={25}
+                        style={{ borderRadius: "50%" }}
+                      />
+                    </Box>
+                    <Text
+                      fontSize="0.7rem"
+                      fontWeight="800"
+                      color={theme.colors.primary}
+                      mr="0.5rem"
+                    >
+                      ...
+                      {/* {`${tournament.creator}`} */}
+                    </Text>
+                  </Flex>
+                  <Text
+                    fontSize="0.7rem"
+                    fontWeight="500"
+                    fontStyle="italic"
+                    color={theme.colors.primary}
+                    mr="0.5rem"
+                  >
+                    0
+                  </Text>
+                </Flex>
               </Flex>
             </List>
           </Flex>
-          <Button
-            mb="0.5rem"
-            bg={theme.colors.green}
-            color="white"
-            width="100%"
-            borderColor={theme.colors.green}
-            borderWidth="2px"
-            borderRadius="1px"
-            h="2.25rem"
-            w="100%"
-            fontSize="0.8rem"
-            fontWeight="700"
-            isDisabled={false}
-            _hover={{
-              bg: theme.colors.darkerGreen,
-              borderColor: theme.colors.darkerGreen,
-            }}
-            onClick={() => setCreatingTournament(true)}
-          >
-            JOIN FOR ${selectedTournament.id}.00
-          </Button>
+          <Flex w="100%" h="100%">
+            <Button
+              mb="1rem"
+              bg={theme.colors.green}
+              color="white"
+              width="100%"
+              borderColor={theme.colors.green}
+              borderWidth="2px"
+              borderRadius="1px"
+              h="2.25rem"
+              w="100%"
+              fontSize="0.8rem"
+              fontWeight="700"
+              isDisabled={false}
+              _hover={{
+                bg: theme.colors.darkerGreen,
+                borderColor: theme.colors.darkerGreen,
+              }}
+              onClick={() => setCreatingTournament(true)}
+            >
+              JOIN FOR ${selectedTournament.id}.00
+            </Button>
+          </Flex>
         </Flex>
       </Flex>
     );
@@ -498,7 +623,7 @@ export function Tournaments() {
       </Flex>
 
       <Flex w="100%" h="100%" justifyContent="start">
-        <List width="100%" h="15rem" overflowY="auto">
+        <List width="100%" h="15.25rem" overflowY="auto">
           {tournaments.length > 0 || true ? (
             <>
               <Box
