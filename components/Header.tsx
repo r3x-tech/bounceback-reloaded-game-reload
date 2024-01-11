@@ -18,7 +18,7 @@ import { Tournaments } from "./Tournaments";
 import { Leaderboard } from "./Leaderboard";
 import { Customize } from "./Customize";
 import { TbMoodEdit } from "react-icons/tb";
-import { SiGamejolt } from "react-icons/si";
+import { IoMdTrophy } from "react-icons/io";
 
 const Header = ({
   onConnect,
@@ -42,9 +42,10 @@ const Header = ({
       maxWidth="360px"
       width="100%"
     >
-      <Flex flex="2" justifyContent="flex-start">
+      <Flex flex="1.75" justifyContent="flex-start">
         <LoginComponent />
       </Flex>
+
       <Flex flex="1" justifyContent="center">
         <Popover placement="bottom-end">
           <PopoverTrigger>
@@ -63,7 +64,7 @@ const Header = ({
             mt="2px"
             py={3}
             px={5}
-            style={{ marginRight: "-123px" }}
+            style={{ marginRight: "-188px" }}
           >
             <PopoverCloseButton
               position="absolute"
@@ -93,7 +94,7 @@ const Header = ({
             mt="2px"
             py={3}
             px={5}
-            style={{ marginRight: "-2px" }}
+            style={{ marginRight: "-92px" }}
           >
             <PopoverCloseButton
               position="absolute"
@@ -102,6 +103,35 @@ const Header = ({
               fontSize="0.75rem"
             />
             <Customize />
+          </PopoverContent>
+        </Popover>
+      </Flex>
+      <Flex flex="1.25" justifyContent="flex-end">
+        <Popover placement="bottom-end">
+          <PopoverTrigger>
+            <Box cursor="pointer">
+              <IoMdTrophy size="1.75rem" color="white" />
+            </Box>
+          </PopoverTrigger>
+          <PopoverContent
+            color="#fff"
+            width="365px"
+            border="2px solid white"
+            borderRadius="0px"
+            bg={theme.colors.black}
+            height="23rem"
+            mt="2px"
+            py={3}
+            px={5}
+            style={{ marginRight: "-2px" }}
+          >
+            <PopoverCloseButton
+              position="absolute"
+              top={4}
+              right={4}
+              fontSize="0.75rem"
+            />
+            <Tournaments />
           </PopoverContent>
         </Popover>
       </Flex>

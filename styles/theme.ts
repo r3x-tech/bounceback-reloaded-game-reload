@@ -14,6 +14,13 @@ const theme = extendTheme({
     darkerGray: "#86868B",
     input: "#1B1B1F",
     background: "#000000",
+    orange: "#F77622",
+    pink: "#FF1644",
+    pinkhighlight: "#FF4769",
+    blue: "#665EFF",
+    bluehighlight: "#817df2",
+    green: "#0dd353",
+    greenhighlight: "#04e762",
   },
   fonts: {
     body: "Montserrat, sans-serif",
