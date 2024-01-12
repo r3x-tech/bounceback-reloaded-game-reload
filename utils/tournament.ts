@@ -8,7 +8,6 @@ export async function createTournament(
   wallet: Wallet,
   connection: Connection,
   entryFee: Solana.Rpc.Events.EntryFee,
-  rewardMint: string,
   rewardAmount: number
 ): Promise<string> {
   // Create an Anchor Provider
@@ -45,7 +44,7 @@ export async function createTournament(
     // Add an additional reward
     await authority.addReward(
       tournamentPubkey,
-      rewardMint,
+      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       rewardAmount.toString()
     );
 

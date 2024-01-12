@@ -7,6 +7,7 @@ import {
   Button,
   Flex,
   Tooltip,
+  Input,
 } from "@chakra-ui/react";
 import { Tournament, getTournamentsByGameName } from "../utils/getTournaments";
 import theme from "@/styles/theme";
@@ -20,6 +21,10 @@ import { FaCopy, FaShare } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { Controller, useForm } from "react-hook-form";
+import { createTournament } from "@/utils/tournament";
+import { BN } from "@project-serum/anchor";
+import { PublicKey } from "@solana/web3.js";
 
 dayjs.extend(duration);
 
@@ -29,6 +34,9 @@ export function Tournaments() {
     loggedIn,
     loginType,
     solana_wallet_address,
+    connection,
+    wallet,
+    current_provider,
     ip_address,
     userProfilePic,
   } = userStore();
@@ -38,6 +46,50 @@ export function Tournaments() {
     useState<Tournament | null>(null);
   const [creatingTournament, setCreatingTournament] = useState<boolean>(false);
   const router = useRouter();
+
+  const { handleSubmit, control, formState } = useForm<FormData>();
+  const { errors } = formState;
+
+  const handleCreateTournament = async (data: FormData) => {
+    console.log("ran handleGenerateBallImage");
+
+    // Validate prompt
+    if (
+      !data.tournamentName ||
+      !data.tournamentSize ||
+      !wallet ||
+      !connection
+    ) {
+      toast.error("All form inputs are required");
+      return;
+    }
+
+    setCreatingTournament(true);
+    const currentEntryFee = {
+      mint: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+      amount: new BN(100000 * data.tournamentEntryFee),
+    };
+
+    const createdTournament = await createTournament(
+      data.tournamentName,
+      data.tournamentSize,
+      wallet,
+      connection,
+      currentEntryFee,
+      data.tournamentRewardAmount
+    );
+
+    if (createdTournament) {
+      // if (createdTournament) {
+      // setTournament(createdTournament);
+      toast.success("Generated ball image");
+      console.log("createdTournament: ", createdTournament);
+    } else {
+      toast.error("Failed to generate image");
+      setCreatingTournament(false);
+    }
+    // setCreatingTournament(false);
+  };
 
   useEffect(() => {
     getTournamentsByGameName("Bounceback Reload").then((data: Tournament[]) => {
@@ -60,42 +112,42 @@ export function Tournaments() {
     return num.toString().padStart(2, "0");
   };
 
-  const timeRemaining = (start: string, end: string) => {
-    let now = dayjs();
-    let startDate = dayjs(start);
-    let endDate = dayjs(end);
+  // const timeRemaining = (start: string, end: string) => {
+  //   let now = dayjs();
+  //   let startDate = dayjs(start);
+  //   let endDate = dayjs(end);
 
-    let diff;
-    let status;
+  //   let diff;
+  //   let status;
 
-    if (now.isBefore(startDate)) {
-      diff = dayjs.duration(startDate.diff(now));
-      status = "Starts in";
-    } else if (now.isBefore(endDate)) {
-      diff = dayjs.duration(endDate.diff(now));
-      status = "Ends in";
-    } else {
-      diff = dayjs.duration(0);
-      status = "Ended";
-    }
+  //   if (now.isBefore(startDate)) {
+  //     diff = dayjs.duration(startDate.diff(now));
+  //     status = "Starts in";
+  //   } else if (now.isBefore(endDate)) {
+  //     diff = dayjs.duration(endDate.diff(now));
+  //     status = "Ends in";
+  //   } else {
+  //     diff = dayjs.duration(0);
+  //     status = "Ended";
+  //   }
 
-    return {
-      time: `${formatNumber(diff.days())}d ${formatNumber(
-        diff.hours()
-      )}h ${formatNumber(diff.minutes())}m`,
-      status: status,
-    };
-  };
+  //   return {
+  //     time: `${formatNumber(diff.days())}d ${formatNumber(
+  //       diff.hours()
+  //     )}h ${formatNumber(diff.minutes())}m`,
+  //     status: status,
+  //   };
+  // };
 
-  const formatUsername = (name: string) => {
-    if (name.length <= 16) {
-      return name;
-    }
-    if (name == "") {
-      return "NA";
-    }
-    return `${name.substring(0, 3)}...${name.substring(name.length - 5)}`;
-  };
+  // const formatUsername = (name: string) => {
+  //   if (name.length <= 16) {
+  //     return name;
+  //   }
+  //   if (name == "") {
+  //     return "NA";
+  //   }
+  //   return `${name.substring(0, 3)}...${name.substring(name.length - 5)}`;
+  // };
 
   if (selectedTournament) {
     // Render Tournament Details View
@@ -526,34 +578,160 @@ export function Tournaments() {
           justifyContent="start"
           align="space-between"
         >
-          <Text
-            color="#fbfbfb"
-            fontSize="1.25rem"
-            fontWeight="700"
-            textAlign="start"
-            width="100%"
-          >
-            TOURNAMENTS
-          </Text>
+          <Flex w="100%" h="2rem" justifyContent="start" align="center">
+            <Flex flex={10}>
+              <Text
+                color="#fbfbfb"
+                fontSize="1rem"
+                fontWeight="700"
+                textAlign="start"
+                width="100%"
+              >
+                CREATE TOURNAMENT
+              </Text>
+            </Flex>
+            <Flex flex={1}></Flex>
+          </Flex>
           <Flex
             w="100%"
-            h="2rem"
+            h="100%"
             justifyContent="start"
-            align="center"
+            align="start"
             mt="1rem"
           >
-            <Text
-              color="#fbfbfb"
-              fontSize="0.9rem"
-              overflow="auto"
-              fontWeight="700"
-              textAlign="center"
-              width="100%"
-              // bg="red"
-              mx="0.5rem"
-            >
-              CREATE
-            </Text>
+            <VStack as="form" onSubmit={() => {}} w="100%">
+              <Flex flexDirection="column" w="100%" mt="0rem">
+                <Text
+                  fontWeight="700"
+                  fontFamily={theme.fonts.body}
+                  fontSize="0.75rem"
+                  pb="0.25rem"
+                >
+                  TOURNAMENT NAME *
+                </Text>
+                <Controller
+                  name="tournamentName"
+                  control={control}
+                  defaultValue=""
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Name your tournament"
+                      w="100%"
+                      h="2rem"
+                      fontSize="0.75rem"
+                      bg={theme.colors.input}
+                      borderWidth="2px"
+                      borderRadius="1px"
+                      borderColor={theme.colors.input}
+                      fontWeight="500"
+                      letterSpacing="1px"
+                      color={theme.colors.primary}
+                      focusBorderColor={theme.colors.input}
+                      _placeholder={{ color: theme.colors.darkerGray }}
+                      _focus={{ boxShadow: "none" }}
+                    />
+                  )}
+                />
+
+                {errors.tournamentName && (
+                  <Flex w="97%" h="1rem" justifyContent="start" m="0" p="0">
+                    <Text fontSize="0.75rem" color="red" m="0" p="0">
+                      Tournament is required
+                    </Text>
+                  </Flex>
+                )}
+              </Flex>
+
+              <Flex flexDirection="column" w="100%" mt="0rem">
+                <Text
+                  fontWeight="700"
+                  fontFamily={theme.fonts.body}
+                  fontSize="0.75rem"
+                  pb="0.25rem"
+                >
+                  TOURNAMENT SIZE (max # of players) *{" "}
+                </Text>
+                <Controller
+                  name="tournamentSize"
+                  control={control}
+                  defaultValue={0}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Enter a tournament size"
+                      w="100%"
+                      h="2rem"
+                      fontSize="0.75rem"
+                      bg={theme.colors.input}
+                      borderWidth="2px"
+                      borderRadius="1px"
+                      borderColor={theme.colors.input}
+                      fontWeight="500"
+                      letterSpacing="1px"
+                      color={theme.colors.primary}
+                      focusBorderColor={theme.colors.input}
+                      _placeholder={{ color: theme.colors.darkerGray }}
+                      _focus={{ boxShadow: "none" }}
+                    />
+                  )}
+                />
+
+                {errors.tournamentSize && (
+                  <Flex w="97%" h="1rem" justifyContent="start" m="0" p="0">
+                    <Text fontSize="0.75rem" color="red" m="0" p="0">
+                      Tournament size is required
+                    </Text>
+                  </Flex>
+                )}
+              </Flex>
+
+              <Flex flexDirection="column" w="100%" mt="0rem">
+                <Text
+                  fontWeight="700"
+                  fontFamily={theme.fonts.body}
+                  fontSize="0.75rem"
+                  pb="0.25rem"
+                >
+                  ENTRY FEE (in USD) *{" "}
+                </Text>
+                <Controller
+                  name="tournamentEntryFee"
+                  control={control}
+                  defaultValue={0}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Enter a tournament entry fee in USD"
+                      w="100%"
+                      h="2rem"
+                      fontSize="0.75rem"
+                      bg={theme.colors.input}
+                      borderWidth="2px"
+                      borderRadius="1px"
+                      borderColor={theme.colors.input}
+                      fontWeight="500"
+                      letterSpacing="1px"
+                      color={theme.colors.primary}
+                      focusBorderColor={theme.colors.input}
+                      _placeholder={{ color: theme.colors.darkerGray }}
+                      _focus={{ boxShadow: "none" }}
+                    />
+                  )}
+                />
+
+                {errors.tournamentEntryFee && (
+                  <Flex w="97%" h="1rem" justifyContent="start" m="0" p="0">
+                    <Text fontSize="0.75rem" color="red" m="0" p="0">
+                      Tournament entry fee is required
+                    </Text>
+                  </Flex>
+                )}
+              </Flex>
+            </VStack>
           </Flex>
           <Flex w="100%" gap="0.75rem">
             <Button
@@ -849,3 +1027,11 @@ export function Tournaments() {
     </Flex>
   );
 }
+
+type FormData = {
+  tournamentName: string;
+  tournamentSize: number;
+  // tournamentType: Map<string, number>;
+  tournamentEntryFee: number;
+  tournamentRewardAmount: number;
+};

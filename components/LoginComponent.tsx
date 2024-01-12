@@ -50,6 +50,7 @@ import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import { useGameOverModalStore } from "@/stores/useGameOverModalStore";
 import React from "react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { AnchorProvider } from "@project-serum/anchor";
 
 // const LABELS = {
 //   "change-wallet": "CHANGE WALLET",
@@ -167,6 +168,7 @@ export const LoginComponent = () => {
 
         const account = await (magic as any)?.oauth.getRedirectResult();
         console.log("google account: ", account);
+        console.log("google provider: ", magic?.wallet.getProvider());
         if (account) {
           fetch("https://api.ipify.org?format=json")
             .then((response) => response.json())
