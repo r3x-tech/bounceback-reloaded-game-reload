@@ -34,9 +34,6 @@ export function Tournaments() {
     loggedIn,
     loginType,
     solana_wallet_address,
-    connection,
-    wallet,
-    current_provider,
     ip_address,
     userProfilePic,
   } = userStore();
@@ -57,8 +54,8 @@ export function Tournaments() {
     if (
       !data.tournamentName ||
       !data.tournamentSize ||
-      !wallet ||
-      !connection
+      !data.tournamentEntryFee ||
+      !data.tournamentRewardAmount
     ) {
       toast.error("All form inputs are required");
       return;
@@ -70,14 +67,16 @@ export function Tournaments() {
       amount: new BN(100000 * data.tournamentEntryFee),
     };
 
-    const createdTournament = await createTournament(
-      data.tournamentName,
-      data.tournamentSize,
-      wallet,
-      connection,
-      currentEntryFee,
-      data.tournamentRewardAmount
-    );
+    // const createdTournament = await createTournament(
+    //   data.tournamentName,
+    //   data.tournamentSize,
+    //   wallet,
+    //   connection,
+    //   currentEntryFee,
+    //   data.tournamentRewardAmount
+    // );
+
+    const createdTournament = false;
 
     if (createdTournament) {
       // if (createdTournament) {
@@ -104,6 +103,10 @@ export function Tournaments() {
   }, [router.query.tournamentId]);
 
   const selectTournament = (tournament: Tournament) => {
+    if (!loggedIn || solana_wallet_address.trim() == "") {
+      toast.error("Login to view tournament details");
+      return;
+    }
     setSelectedTournament(tournament);
     // Update URL without navigating
     router.push(`?tournamentId=${tournament.id}`, undefined, { shallow: true });
@@ -695,7 +698,7 @@ export function Tournaments() {
                   fontSize="0.75rem"
                   pb="0.25rem"
                 >
-                  ENTRY FEE (in USD) *{" "}
+                  ENTRY FEE (in $USD) *{" "}
                 </Text>
                 <Controller
                   name="tournamentEntryFee"
@@ -731,9 +734,52 @@ export function Tournaments() {
                   </Flex>
                 )}
               </Flex>
+              <Flex flexDirection="column" w="100%" mt="0rem">
+                <Text
+                  fontWeight="700"
+                  fontFamily={theme.fonts.body}
+                  fontSize="0.75rem"
+                  pb="0.25rem"
+                >
+                  SEED PRIZE POOL (in $USD) *{" "}
+                </Text>
+                <Controller
+                  name="tournamentEntryFee"
+                  control={control}
+                  defaultValue={0}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="Enter an amount of USD to seed prize pool with"
+                      w="100%"
+                      h="2rem"
+                      fontSize="0.75rem"
+                      bg={theme.colors.input}
+                      borderWidth="2px"
+                      borderRadius="1px"
+                      borderColor={theme.colors.input}
+                      fontWeight="500"
+                      letterSpacing="1px"
+                      color={theme.colors.primary}
+                      focusBorderColor={theme.colors.input}
+                      _placeholder={{ color: theme.colors.darkerGray }}
+                      _focus={{ boxShadow: "none" }}
+                    />
+                  )}
+                />
+
+                {errors.tournamentEntryFee && (
+                  <Flex w="97%" h="1rem" justifyContent="start" m="0" p="0">
+                    <Text fontSize="0.75rem" color="red" m="0" p="0">
+                      Tournament entry fee is required
+                    </Text>
+                  </Flex>
+                )}
+              </Flex>
             </VStack>
           </Flex>
-          <Flex w="100%" gap="0.75rem">
+          <Flex w="100%" gap="0.75rem" mb="0.75rem">
             <Button
               bg={theme.colors.red}
               color="white"
@@ -763,10 +809,13 @@ export function Tournaments() {
               fontSize="0.8rem"
               fontWeight="700"
               isDisabled={false}
-              // onClick={() => {
-              //   console.log("check 1 ran");
-              //   handleSubmit(handleGenerateBallImage);
-              // }}
+              onClick={() => {
+                if (!loggedIn || solana_wallet_address.trim() == "") {
+                  toast.error("Login to create a tournament");
+                  return;
+                }
+                handleSubmit(handleCreateTournament);
+              }}
               type="submit"
               _hover={{
                 bg: theme.colors.darkerGreen,
@@ -881,7 +930,7 @@ export function Tournaments() {
                             onClick={async () => {
                               try {
                                 // await navigator.clipboard.writeText(solana_wallet_address);
-                                toast.success("Copied Username");
+                                toast.success("Copied Share Link");
                               } catch (err) {
                                 console.error("Failed to copy address: ", err);
                                 toast.error("Failed to copy address");

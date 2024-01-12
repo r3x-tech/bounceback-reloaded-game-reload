@@ -50,7 +50,8 @@ import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import { useGameOverModalStore } from "@/stores/useGameOverModalStore";
 import React from "react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { AnchorProvider } from "@project-serum/anchor";
+import { AnchorProvider, Wallet } from "@project-serum/anchor";
+import * as web3 from "@solana/web3.js";
 
 // const LABELS = {
 //   "change-wallet": "CHANGE WALLET",
@@ -167,8 +168,10 @@ export const LoginComponent = () => {
         // console.log("google metadata: ", metadata);
 
         const account = await (magic as any)?.oauth.getRedirectResult();
-        console.log("google account: ", account);
-        console.log("google provider: ", magic?.wallet.getProvider());
+        console.log("google account: ", account.magic);
+        console.log("google wallet: ", await account.magic?.wallet);
+        console.log("google provider: ", account.magic?.rpcProvider);
+
         if (account) {
           fetch("https://api.ipify.org?format=json")
             .then((response) => response.json())
@@ -179,6 +182,12 @@ export const LoginComponent = () => {
                 username: account.oauth.userInfo.email || "",
                 solana_wallet_address:
                   account.magic?.userMetadata.publicAddress || "",
+                // wallet: {
+                //   payer:
+                //   signTransaction:
+                //   signAllTransactions:
+                //   publicKey:
+                // },
                 ip_address: data.ip,
               });
             });
@@ -214,7 +223,8 @@ export const LoginComponent = () => {
         console.log("google login");
         await (magic as any)?.oauth.loginWithRedirect({
           provider: "google",
-          redirectURI: "https://bounceback.r3x.tech/",
+          // redirectURI: "https://bounceback.r3x.tech/",
+          redirectURI: "http://localhost:3000/",
         });
       } catch (e) {
         console.log("login error: " + JSON.stringify(e));
@@ -245,7 +255,15 @@ export const LoginComponent = () => {
           });
 
           if (account) {
+            console.log("phone wallet: ", await magic?.wallet.getInfo());
+            console.log(
+              "phone wallet provider: ",
+              await magic?.wallet.getProvider()
+            );
+            console.log("phone provider: ", magic?.rpcProvider);
             const metadata = await magic?.user.getInfo();
+            const provider = await magic?.wallet.getProvider();
+            console.log("phone metadata: ", metadata);
             fetch("https://api.ipify.org?format=json")
               .then((response) => response.json())
               .then((data) => {
@@ -545,7 +563,7 @@ export const LoginComponent = () => {
             </Flex>
           ) : loggedInStatus ? (
             <VStack spacing={4} padding="1rem" align="flex-start">
-              <Flex direction="column" align="flex-start">
+              <Flex direction="column" align="flex-start" w="100%">
                 <Flex m="0.75rem" align="center">
                   <Box>
                     <Image
@@ -592,39 +610,73 @@ export const LoginComponent = () => {
                     </Flex>
                   </Tooltip>
                 </Flex>
+                <Flex w="100%" h="100%" justifyContent="start" align="center">
+                  <Flex
+                    w="12.5rem"
+                    h="2.25rem"
+                    justifyContent="center"
+                    align="center"
+                  >
+                    <Text
+                      fontSize="0.9rem"
+                      fontWeight="700"
+                      color={theme.colors.primary}
+                    >
+                      Balance:
+                      {/* {`${tournament.creator}`} */}
+                    </Text>
+                    <Text
+                      ml="0.5rem"
+                      fontSize="0.9rem"
+                      fontWeight="700"
+                      color={theme.colors.green}
+                    >
+                      ${`222`}.00 USD
+                    </Text>
+                  </Flex>
 
-                {/* <Button
-                  variant="ghost"
-                  onClick={() => {
-                    router.push("/mymachines");
-                  }}
-                  _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
-                >
-                  My Racks
-                </Button> */}
-                {/* <Button
-                              variant="ghost"
-                              onClick={() => {
-                                router.push("/settings");
-                              }}
-                              _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
-                            >
-                              Settings
-                            </Button> */}
+                  <Button
+                    fontSize="0.75rem"
+                    fontWeight="700"
+                    as="a"
+                    href="https://www.r3x.tech/contact"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="ghost"
+                    border="2px solid white"
+                    h="1.5rem"
+                    px="0.5rem"
+                    borderRadius="2px"
+                    _hover={{
+                      color: "rgba(255, 255, 255, 0.8)",
+                      borderColor: "rgba(255, 255, 255, 0.8)",
+                    }}
+                  >
+                    BUY MORE +
+                  </Button>
+                </Flex>
+                <Flex w="100%">
+                  <Button
+                    fontSize="0.9rem"
+                    fontWeight="700"
+                    as="a"
+                    href="https://www.r3x.tech/contact"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="ghost"
+                    _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
+                  >
+                    Need Help?
+                  </Button>
+                </Flex>
+
                 <Button
-                  as="a"
-                  href="https://www.r3x.tech/contact"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant="ghost"
-                  _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
-                >
-                  Need Help?
-                </Button>
-                <Button
+                  fontSize="0.9rem"
+                  fontWeight="700"
                   variant="ghost"
                   onClick={handleLogout}
-                  _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
+                  color={theme.colors.red}
+                  _hover={{ color: "rgba(255, 0, 0, 0.8)" }}
                 >
                   Logout
                 </Button>
