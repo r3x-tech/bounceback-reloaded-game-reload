@@ -48,7 +48,11 @@ export function Tournaments() {
   const { errors } = formState;
 
   const handleCreateTournament = async (data: FormData) => {
-    console.log("ran handleGenerateBallImage");
+    console.log("ran handleCreateTournament");
+    if (!loggedIn || solana_wallet_address.trim() == "") {
+      toast.error("Login to create a tournament");
+      return;
+    }
 
     // Validate prompt
     if (
@@ -81,10 +85,10 @@ export function Tournaments() {
     if (createdTournament) {
       // if (createdTournament) {
       // setTournament(createdTournament);
-      toast.success("Generated ball image");
+      toast.success("Created Tournament");
       console.log("createdTournament: ", createdTournament);
     } else {
-      toast.error("Failed to generate image");
+      toast.error("Failed to create tournament");
       setCreatingTournament(false);
     }
     // setCreatingTournament(false);
@@ -600,9 +604,13 @@ export function Tournaments() {
             h="100%"
             justifyContent="start"
             align="start"
-            mt="1rem"
+            mt="0.5rem"
           >
-            <VStack as="form" onSubmit={() => {}} w="100%">
+            <VStack
+              as="form"
+              onSubmit={handleSubmit(handleCreateTournament)}
+              w="100%"
+            >
               <Flex flexDirection="column" w="100%" mt="0rem">
                 <Text
                   fontWeight="700"
@@ -809,13 +817,6 @@ export function Tournaments() {
               fontSize="0.8rem"
               fontWeight="700"
               isDisabled={false}
-              onClick={() => {
-                if (!loggedIn || solana_wallet_address.trim() == "") {
-                  toast.error("Login to create a tournament");
-                  return;
-                }
-                handleSubmit(handleCreateTournament);
-              }}
               type="submit"
               _hover={{
                 bg: theme.colors.darkerGreen,
