@@ -10,7 +10,7 @@ import {
   TabPanels,
   TabPanel,
 } from "@chakra-ui/react";
-import { getLeaderboard, Score } from "../utils/getLeaderboard";
+import { getLeaderboard, Score } from "../utils/supabase";
 import theme from "@/styles/theme";
 
 export function Leaderboard() {

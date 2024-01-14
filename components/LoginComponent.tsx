@@ -44,7 +44,7 @@ import { countryPhoneCodes } from "./constants";
 import { FaCopy, FaDiscord, FaPhoneAlt, FaTwitter } from "react-icons/fa";
 import { useLoginModalStore } from "@/stores/useLoginModalStore";
 import { useLoadingStore } from "@/stores/useLoadingStore";
-import { saveHighScore } from "@/utils/saveHighScore";
+import { saveHighScore } from "@/utils/supabase";
 import { useScoreStore } from "@/stores/useScoreStore";
 import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import { useGameOverModalStore } from "@/stores/useGameOverModalStore";
@@ -623,7 +623,6 @@ export const LoginComponent = () => {
                       color={theme.colors.primary}
                     >
                       Balance:
-                      {/* {`${tournament.creator}`} */}
                     </Text>
                     <Text
                       ml="0.5rem"
