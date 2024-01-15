@@ -9,7 +9,7 @@ import {
   Tooltip,
   Input,
 } from "@chakra-ui/react";
-import { Tournament, getTournamentsByGameName } from "../utils/getTournaments";
+import { Tournament, getTournamentsByGameName } from "../utils/tournament";
 import theme from "@/styles/theme";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
