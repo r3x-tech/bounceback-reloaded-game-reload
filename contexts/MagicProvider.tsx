@@ -19,34 +19,48 @@ export type Magic = MagicBase<
 type MagicContextType = {
   magic: Magic | null;
   connection: Connection | null;
+  signMagicTransaction: any | null;
+  signAllMagicTransactions: any | null;
 };
 
 const MagicContext = createContext<MagicContextType>({
   magic: null,
   connection: null,
+  signMagicTransaction: null,
+  signAllMagicTransactions: null,
 });
 
 const MagicProvider = ({ children }: { children: ReactNode }) => {
   const [magic, setMagic] = useState<Magic | null>(null);
   const [connection, setConnection] = useState<Connection | null>(null);
+  const [signMagicTransaction, setSignMagicTransaction] = useState<any>(null);
+  const [signAllMagicTransactions, setSignAllMagicTransactions] =
+    useState<any>(null);
 
-  const rpcURL = process.env.NEXT_PUBLIC_ENDPOINT;
+  const rpcURL = process.env.NEXT_PUBLIC_ENDPOINT!;
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_MAGIC_API_KEY) {
-      const pk = process.env.NEXT_PUBLIC_MAGIC_API_KEY;
-      const magic = new MagicBase(pk, {
-        extensions: [
-          new OAuthExtension(),
-          new AuthExtension(),
-          new SolanaExtension({
-            rpcUrl: rpcURL!,
-          }),
-        ],
-      });
-      const connection = new Connection(rpcURL!);
-      setMagic(magic);
-      setConnection(connection);
+    if (rpcURL && process.env.NEXT_PUBLIC_MAGIC_API_KEY) {
+      try {
+        const pk = process.env.NEXT_PUBLIC_MAGIC_API_KEY;
+        const magicInstance = new MagicBase(pk, {
+          extensions: [
+            new OAuthExtension(),
+            new AuthExtension(),
+            new SolanaExtension({
+              rpcUrl: rpcURL,
+            }),
+          ],
+        });
+
+        const connectionInstance = new Connection(rpcURL);
+        setMagic(magicInstance);
+        setConnection(connectionInstance);
+        setSignMagicTransaction(() => magicInstance.solana.signTransaction);
+        setSignAllMagicTransactions(() => magicInstance.solana.signTransaction);
+      } catch (error) {
+        console.error("Error initializing Magic or Connection:", error);
+      }
     }
   }, [rpcURL]);
 
@@ -54,8 +68,10 @@ const MagicProvider = ({ children }: { children: ReactNode }) => {
     return {
       magic,
       connection,
+      signMagicTransaction,
+      signAllMagicTransactions,
     };
-  }, [magic, connection]);
+  }, [magic, connection, signMagicTransaction, signAllMagicTransactions]);
 
   return (
     <MagicContext.Provider value={value}>{children}</MagicContext.Provider>

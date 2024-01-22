@@ -2,31 +2,46 @@ import { Solana } from "@raindrop-studios/events-client";
 import { AnchorProvider, Wallet } from "@project-serum/anchor";
 import { Connection } from "@solana/web3.js";
 import { supabase } from "@/supabaseClient";
+import { AnchorWallet } from "@solana/wallet-adapter-react";
 
 export async function createTournament(
   tournamentName: string,
   participantLimit: number,
-  wallet: Wallet,
+  wallet: AnchorWallet,
   connection: Connection,
   entryFee: Solana.Rpc.Events.EntryFee,
   rewardAmount: number
 ): Promise<string> {
   // Create an Anchor Provider
+
+  if (!wallet) {
+    throw Error("provider not found");
+  }
+  console.log("wallet: ", wallet);
+
   const provider = new AnchorProvider(connection, wallet, {});
+  console.log("provider: ", provider);
+
+  if (!provider) {
+    throw Error("provider not found");
+  }
   // Initialize the tournament authority
   const authority = new Solana.Http.Tournaments.Client(
     provider,
     "mainnet-beta"
   );
 
+  console.log("passed authority: ", authority);
+
   try {
     // Create a tournament
     const tournamentPubkey = await authority.createTournament(
-      tournamentName,
-      participantLimit,
-      entryFee,
+      "test",
+      2,
+      null,
       null
     );
+    console.log("tournamentPubkey: ", tournamentPubkey);
 
     if (!tournamentPubkey) {
       throw new Error("Tournament unavailable");

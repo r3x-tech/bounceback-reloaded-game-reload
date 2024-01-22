@@ -8,6 +8,7 @@ import {
   Flex,
   Tooltip,
   Input,
+  Spinner,
 } from "@chakra-ui/react";
 import { Tournament, getTournamentsByGameName } from "../utils/tournament";
 import theme from "@/styles/theme";
@@ -23,8 +24,11 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { Controller, useForm } from "react-hook-form";
 import { createTournament } from "@/utils/tournament";
-import { BN } from "@project-serum/anchor";
+import { BN, AnchorProvider } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
+import * as web3 from "@solana/web3.js";
+import { useMagic } from "@/contexts/MagicProvider";
+import { useLoadingStore } from "@/stores/useLoadingStore";
 
 dayjs.extend(duration);
 
@@ -34,9 +38,13 @@ export function Tournaments() {
     loggedIn,
     loginType,
     solana_wallet_address,
+    currentConnection,
+    currentWallet,
     ip_address,
     userProfilePic,
   } = userStore();
+
+  const { magic } = useMagic();
 
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [selectedTournament, setSelectedTournament] =
@@ -54,33 +62,53 @@ export function Tournaments() {
       return;
     }
 
-    // Validate prompt
+    setCreatingTournament(true);
+
+    // Assuming data is the object containing your form values
+    const parsedData = {
+      ...data,
+      tournamentSize: data.tournamentSize || 0,
+      tournamentEntryFee: data.tournamentEntryFee || 0,
+      tournamentRewardAmount: data.tournamentRewardAmount || 0,
+    };
+
+    // Now check if any field is empty or zero
     if (
-      !data.tournamentName ||
-      !data.tournamentSize ||
-      !data.tournamentEntryFee ||
-      !data.tournamentRewardAmount
+      !parsedData.tournamentName ||
+      parsedData.tournamentSize === undefined ||
+      parsedData.tournamentEntryFee === undefined ||
+      parsedData.tournamentRewardAmount === undefined
     ) {
+      console.log("DATA is: ", data);
       toast.error("All form inputs are required");
       return;
     }
 
-    setCreatingTournament(true);
+    if (!currentWallet) {
+      toast.error("Wallet not found");
+      return;
+    }
+
+    if (!currentConnection) {
+      toast.error("Connection not found");
+      return;
+    }
+
     const currentEntryFee = {
       mint: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-      amount: new BN(100000 * data.tournamentEntryFee),
+      amount: new BN(100000 * parsedData.tournamentEntryFee),
     };
 
-    // const createdTournament = await createTournament(
-    //   data.tournamentName,
-    //   data.tournamentSize,
-    //   wallet,
-    //   connection,
-    //   currentEntryFee,
-    //   data.tournamentRewardAmount
-    // );
+    const createdTournament = await createTournament(
+      parsedData.tournamentName,
+      parsedData.tournamentSize,
+      currentWallet,
+      currentConnection,
+      currentEntryFee,
+      parsedData.tournamentRewardAmount
+    );
 
-    const createdTournament = false;
+    // const createdTournament = false;
 
     if (createdTournament) {
       // if (createdTournament) {
@@ -165,406 +193,422 @@ export function Tournaments() {
         align="center"
         h="100%"
       >
-        <Flex
-          w="100%"
-          h="100%"
-          flexDirection="column"
-          justifyContent="start"
-          align="start"
-        >
-          <Flex w="100%" h="2rem" justifyContent="start" align="center">
-            <Flex
-              color="white"
-              _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
-              flex={1}
-            >
-              <MdArrowBack
-                size="1.25rem"
-                style={{
-                  marginLeft: "0px",
-                  cursor: "pointer",
-                  _hover: `{ color: "rgba(255, 255, 255, 0.8)" }`,
-                }}
-                onClick={() => setSelectedTournament(null)}
-              />
-            </Flex>
-            <Flex flex={10}>
-              <Text
-                color="#fbfbfb"
-                fontSize="1rem"
-                fontWeight="700"
-                textAlign="center"
-                width="100%"
-              >
-                {selectedTournament.tournament_name}
-              </Text>
-            </Flex>
-            <Flex flex={1} bg="blue"></Flex>
-          </Flex>
-
+        {creatingTournament || useLoadingStore.getState().loadingStatus ? (
           <Flex
             w="100%"
-            h="1rem"
-            justifyContent="space-between"
-            align="center"
-            mt="0.5rem"
+            h="100%"
+            flexDirection="column"
+            justifyContent="start"
+            align="start"
           >
-            <Flex>
+            <VStack>
+              <Spinner color="#ffffff" />
+              <Text color="white">CREATING TOURNAMENT</Text>
+            </VStack>
+            d
+          </Flex>
+        ) : (
+          <Flex
+            w="100%"
+            h="100%"
+            flexDirection="column"
+            justifyContent="start"
+            align="start"
+          >
+            <Flex w="100%" h="2rem" justifyContent="start" align="center">
+              <Flex
+                color="white"
+                _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
+                flex={1}
+              >
+                <MdArrowBack
+                  size="1.25rem"
+                  style={{
+                    marginLeft: "0px",
+                    cursor: "pointer",
+                    _hover: `{ color: "rgba(255, 255, 255, 0.8)" }`,
+                  }}
+                  onClick={() => setSelectedTournament(null)}
+                />
+              </Flex>
+              <Flex flex={10}>
+                <Text
+                  color="#fbfbfb"
+                  fontSize="1rem"
+                  fontWeight="700"
+                  textAlign="center"
+                  width="100%"
+                >
+                  {selectedTournament.tournament_name}
+                </Text>
+              </Flex>
+              <Flex flex={1} bg="blue"></Flex>
+            </Flex>
+
+            <Flex
+              w="100%"
+              h="1rem"
+              justifyContent="space-between"
+              align="center"
+              mt="0.5rem"
+            >
+              <Flex>
+                <Tooltip
+                  label="Creation Date"
+                  aria-label="Creation Date"
+                  bg="black"
+                  border="1px solid white"
+                >
+                  <Text
+                    color={theme.colors.primary}
+                    fontSize="0.75rem"
+                    overflow="auto"
+                    fontWeight="500"
+                    textAlign="start"
+                    width="100%"
+                  >
+                    {selectedTournament.start_datetime}
+                  </Text>
+                </Tooltip>
+              </Flex>
+
               <Tooltip
-                label="Creation Date"
-                aria-label="Creation Date"
+                label="Tournament Members"
+                aria-label="Tournament Members"
                 bg="black"
                 border="1px solid white"
               >
-                <Text
-                  color={theme.colors.primary}
-                  fontSize="0.75rem"
-                  overflow="auto"
-                  fontWeight="500"
-                  textAlign="start"
-                  width="100%"
-                >
-                  {selectedTournament.start_datetime}
-                </Text>
+                <Flex justifyContent="flex-end">
+                  <MdPerson size="1rem" />
+                  <Text
+                    color={theme.colors.primary}
+                    fontSize="0.7rem"
+                    fontWeight="700"
+                    ml="0.25rem"
+                  >
+                    4/4
+                  </Text>
+                </Flex>
               </Tooltip>
             </Flex>
-
-            <Tooltip
-              label="Tournament Members"
-              aria-label="Tournament Members"
-              bg="black"
-              border="1px solid white"
+            <Flex
+              w="100%"
+              h="2rem"
+              justifyContent="space-between"
+              align="center"
+              mt="0.5rem"
+              gap="0.75rem"
             >
-              <Flex justifyContent="flex-end">
-                <MdPerson size="1rem" />
+              <Flex
+                justifyContent="center"
+                align="center"
+                bg={theme.colors.input}
+                w="100%"
+                h="100%"
+                px="0.5rem"
+                py="1rem"
+                borderRadius="2px"
+                flex={5}
+              >
                 <Text
-                  color={theme.colors.primary}
                   fontSize="0.7rem"
-                  fontWeight="700"
-                  ml="0.25rem"
+                  fontWeight="800"
+                  color={theme.colors.primary}
                 >
-                  4/4
+                  PRIZE POOL:
+                  {/* {`${tournament.creator}`} */}
+                </Text>
+                <Text
+                  ml="0.25rem"
+                  fontSize="0.7rem"
+                  fontWeight="800"
+                  color={theme.colors.green}
+                >
+                  ${`222`}.00
                 </Text>
               </Flex>
-            </Tooltip>
-          </Flex>
-          <Flex
-            w="100%"
-            h="2rem"
-            justifyContent="space-between"
-            align="center"
-            mt="0.5rem"
-            gap="0.75rem"
-          >
-            <Flex
-              justifyContent="center"
-              align="center"
-              bg={theme.colors.input}
-              w="100%"
-              h="100%"
-              px="0.5rem"
-              py="1rem"
-              borderRadius="2px"
-              flex={5}
+              <Flex
+                justifyContent="center"
+                align="center"
+                bg={theme.colors.input}
+                w="100%"
+                h="100%"
+                px="0.5rem"
+                py="0.25rem"
+                borderRadius="2px"
+                flex={5}
+              >
+                {/* <Text
+              textAlign="center"
+              fontSize="0.7rem"
+              fontWeight="800"
+              color={theme.colors.pink}
             >
-              <Text
-                fontSize="0.7rem"
-                fontWeight="800"
-                color={theme.colors.primary}
-              >
-                PRIZE POOL:
-                {/* {`${tournament.creator}`} */}
-              </Text>
-              <Text
-                ml="0.25rem"
-                fontSize="0.7rem"
-                fontWeight="800"
-                color={theme.colors.green}
-              >
-                ${`222`}.00
-              </Text>
-            </Flex>
-            <Flex
-              justifyContent="center"
-              align="center"
-              bg={theme.colors.input}
-              w="100%"
-              h="100%"
-              px="0.5rem"
-              py="0.25rem"
-              borderRadius="2px"
-              flex={5}
+              AWAITING PLAYERS
+            </Text>{" "} */}
+                {/* <Text
+              textAlign="center"
+              fontSize="0.7rem"
+              fontWeight="800"
+              color={theme.colors.orange}
             >
-              {/* <Text
-                textAlign="center"
-                fontSize="0.7rem"
-                fontWeight="800"
-                color={theme.colors.pink}
-              >
-                AWAITING PLAYERS
-              </Text>{" "} */}
-              {/* <Text
-                textAlign="center"
-                fontSize="0.7rem"
-                fontWeight="800"
-                color={theme.colors.orange}
-              >
-                IN PROGRESS
-              </Text> */}
-              <Text
-                textAlign="center"
-                fontSize="0.7rem"
-                fontWeight="800"
-                color={theme.colors.green}
-              >
-                WINNINGS AVAILABLE
-              </Text>
-              {/* 
-              <Text
-                textAlign="center"
-                fontSize="0.7rem"
-                fontWeight="800"
-                color={theme.colors.darkerGray}
-              >
-                FINISHED
-              </Text> */}
-            </Flex>
-          </Flex>
-          <Flex
-            flexDirection="column"
-            justifyContent="center"
-            align="center"
-            bg={theme.colors.input}
-            w="100%"
-            h="11.25rem"
-            my="0.75rem"
-            p="0.75rem"
-            borderRadius="2px"
-            flex={5}
-          >
-            <Flex
-              w="100%"
-              h="10%"
-              justifyContent="space-between"
-              align="start"
-              mb="0.5rem"
+              IN PROGRESS
+            </Text> */}
+                <Text
+                  textAlign="center"
+                  fontSize="0.7rem"
+                  fontWeight="800"
+                  color={theme.colors.green}
+                >
+                  WINNINGS AVAILABLE
+                </Text>
+                {/* 
+            <Text
+              textAlign="center"
+              fontSize="0.7rem"
+              fontWeight="800"
+              color={theme.colors.darkerGray}
             >
-              <Text
-                fontSize="0.7rem"
-                fontWeight="800"
-                color={theme.colors.primary}
-              >
-                LEADERBOARD
-                {/* {`${tournament.creator}`} */}
-              </Text>
-              <Text
-                ml="0.25rem"
-                fontSize="0.7rem"
-                fontWeight="800"
-                color={theme.colors.primary}
-              >
-                SCORE
-              </Text>
-            </Flex>
-
-            <List
-              width="100%"
-              h="100%"
-              justifyContent="space-between"
-              overflowY="auto"
-            >
-              <Flex flexDirection="column" w="100%" h="100%" gap="0.5rem">
-                <Flex h="2rem" align="center" justifyContent="space-between">
-                  <Flex align="center">
-                    {" "}
-                    <Text
-                      fontSize="0.7rem"
-                      fontWeight="800"
-                      color={theme.colors.primary}
-                      mr="0.5rem"
-                    >
-                      1.
-                      {/* {`${tournament.creator}`} */}
-                    </Text>
-                    <Box alignItems="center" mr="0.5rem">
-                      <Image
-                        src={"/assets/ball.png"}
-                        alt="Default ball image"
-                        width={25}
-                        height={25}
-                        style={{ borderRadius: "50%" }}
-                      />
-                    </Box>
-                    <Text
-                      fontSize="0.7rem"
-                      fontWeight="800"
-                      color={theme.colors.primary}
-                      mr="0.5rem"
-                    >
-                      ...
-                      {/* {`${tournament.creator}`} */}
-                    </Text>
-                  </Flex>
-                  <Text
-                    fontSize="0.7rem"
-                    fontWeight="500"
-                    fontStyle="italic"
-                    color={theme.colors.primary}
-                    mr="0.5rem"
-                  >
-                    0
-                  </Text>
-                </Flex>
-                <Flex h="2rem" align="center" justifyContent="space-between">
-                  <Flex align="center">
-                    {" "}
-                    <Text
-                      fontSize="0.7rem"
-                      fontWeight="800"
-                      color={theme.colors.primary}
-                      mr="0.5rem"
-                    >
-                      1.
-                      {/* {`${tournament.creator}`} */}
-                    </Text>
-                    <Box alignItems="center" mr="0.5rem">
-                      <Image
-                        src={"/assets/ball.png"}
-                        alt="Default ball image"
-                        width={25}
-                        height={25}
-                        style={{ borderRadius: "50%" }}
-                      />
-                    </Box>
-                    <Text
-                      fontSize="0.7rem"
-                      fontWeight="800"
-                      color={theme.colors.primary}
-                      mr="0.5rem"
-                    >
-                      ...
-                      {/* {`${tournament.creator}`} */}
-                    </Text>
-                  </Flex>
-                  <Text
-                    fontSize="0.7rem"
-                    fontWeight="500"
-                    fontStyle="italic"
-                    color={theme.colors.primary}
-                    mr="0.5rem"
-                  >
-                    0
-                  </Text>
-                </Flex>
-                <Flex h="2rem" align="center" justifyContent="space-between">
-                  <Flex align="center">
-                    {" "}
-                    <Text
-                      fontSize="0.7rem"
-                      fontWeight="800"
-                      color={theme.colors.primary}
-                      mr="0.5rem"
-                    >
-                      1.
-                      {/* {`${tournament.creator}`} */}
-                    </Text>
-                    <Box alignItems="center" mr="0.5rem">
-                      <Image
-                        src={"/assets/ball.png"}
-                        alt="Default ball image"
-                        width={25}
-                        height={25}
-                        style={{ borderRadius: "50%" }}
-                      />
-                    </Box>
-                    <Text
-                      fontSize="0.7rem"
-                      fontWeight="800"
-                      color={theme.colors.primary}
-                      mr="0.5rem"
-                    >
-                      ...
-                      {/* {`${tournament.creator}`} */}
-                    </Text>
-                  </Flex>
-                  <Text
-                    fontSize="0.7rem"
-                    fontWeight="500"
-                    fontStyle="italic"
-                    color={theme.colors.primary}
-                    mr="0.5rem"
-                  >
-                    0
-                  </Text>
-                </Flex>
-                <Flex h="2rem" align="center" justifyContent="space-between">
-                  <Flex align="center">
-                    {" "}
-                    <Text
-                      fontSize="0.7rem"
-                      fontWeight="800"
-                      color={theme.colors.primary}
-                      mr="0.5rem"
-                    >
-                      1.
-                      {/* {`${tournament.creator}`} */}
-                    </Text>
-                    <Box alignItems="center" mr="0.5rem">
-                      <Image
-                        src={"/assets/ball.png"}
-                        alt="Default ball image"
-                        width={25}
-                        height={25}
-                        style={{ borderRadius: "50%" }}
-                      />
-                    </Box>
-                    <Text
-                      fontSize="0.7rem"
-                      fontWeight="800"
-                      color={theme.colors.primary}
-                      mr="0.5rem"
-                    >
-                      ...
-                      {/* {`${tournament.creator}`} */}
-                    </Text>
-                  </Flex>
-                  <Text
-                    fontSize="0.7rem"
-                    fontWeight="500"
-                    fontStyle="italic"
-                    color={theme.colors.primary}
-                    mr="0.5rem"
-                  >
-                    0
-                  </Text>
-                </Flex>
+              FINISHED
+            </Text> */}
               </Flex>
-            </List>
-          </Flex>
-          <Flex w="100%" h="100%">
-            <Button
-              mb="1rem"
-              bg={theme.colors.green}
-              color="white"
-              width="100%"
-              borderColor={theme.colors.green}
-              borderWidth="2px"
-              borderRadius="1px"
-              h="2.25rem"
+            </Flex>
+            <Flex
+              flexDirection="column"
+              justifyContent="center"
+              align="center"
+              bg={theme.colors.input}
               w="100%"
-              fontSize="0.8rem"
-              fontWeight="700"
-              isDisabled={false}
-              _hover={{
-                bg: theme.colors.darkerGreen,
-                borderColor: theme.colors.darkerGreen,
-              }}
-              onClick={() => setCreatingTournament(true)}
+              h="11.25rem"
+              my="0.75rem"
+              p="0.75rem"
+              borderRadius="2px"
+              flex={5}
             >
-              JOIN FOR ${selectedTournament.id}.00
-            </Button>
+              <Flex
+                w="100%"
+                h="10%"
+                justifyContent="space-between"
+                align="start"
+                mb="0.5rem"
+              >
+                <Text
+                  fontSize="0.7rem"
+                  fontWeight="800"
+                  color={theme.colors.primary}
+                >
+                  LEADERBOARD
+                  {/* {`${tournament.creator}`} */}
+                </Text>
+                <Text
+                  ml="0.25rem"
+                  fontSize="0.7rem"
+                  fontWeight="800"
+                  color={theme.colors.primary}
+                >
+                  SCORE
+                </Text>
+              </Flex>
+
+              <List
+                width="100%"
+                h="100%"
+                justifyContent="space-between"
+                overflowY="auto"
+              >
+                <Flex flexDirection="column" w="100%" h="100%" gap="0.5rem">
+                  <Flex h="2rem" align="center" justifyContent="space-between">
+                    <Flex align="center">
+                      {" "}
+                      <Text
+                        fontSize="0.7rem"
+                        fontWeight="800"
+                        color={theme.colors.primary}
+                        mr="0.5rem"
+                      >
+                        1.
+                        {/* {`${tournament.creator}`} */}
+                      </Text>
+                      <Box alignItems="center" mr="0.5rem">
+                        <Image
+                          src={"/assets/ball.png"}
+                          alt="Default ball image"
+                          width={25}
+                          height={25}
+                          style={{ borderRadius: "50%" }}
+                        />
+                      </Box>
+                      <Text
+                        fontSize="0.7rem"
+                        fontWeight="800"
+                        color={theme.colors.primary}
+                        mr="0.5rem"
+                      >
+                        ...
+                        {/* {`${tournament.creator}`} */}
+                      </Text>
+                    </Flex>
+                    <Text
+                      fontSize="0.7rem"
+                      fontWeight="500"
+                      fontStyle="italic"
+                      color={theme.colors.primary}
+                      mr="0.5rem"
+                    >
+                      0
+                    </Text>
+                  </Flex>
+                  <Flex h="2rem" align="center" justifyContent="space-between">
+                    <Flex align="center">
+                      {" "}
+                      <Text
+                        fontSize="0.7rem"
+                        fontWeight="800"
+                        color={theme.colors.primary}
+                        mr="0.5rem"
+                      >
+                        1.
+                        {/* {`${tournament.creator}`} */}
+                      </Text>
+                      <Box alignItems="center" mr="0.5rem">
+                        <Image
+                          src={"/assets/ball.png"}
+                          alt="Default ball image"
+                          width={25}
+                          height={25}
+                          style={{ borderRadius: "50%" }}
+                        />
+                      </Box>
+                      <Text
+                        fontSize="0.7rem"
+                        fontWeight="800"
+                        color={theme.colors.primary}
+                        mr="0.5rem"
+                      >
+                        ...
+                        {/* {`${tournament.creator}`} */}
+                      </Text>
+                    </Flex>
+                    <Text
+                      fontSize="0.7rem"
+                      fontWeight="500"
+                      fontStyle="italic"
+                      color={theme.colors.primary}
+                      mr="0.5rem"
+                    >
+                      0
+                    </Text>
+                  </Flex>
+                  <Flex h="2rem" align="center" justifyContent="space-between">
+                    <Flex align="center">
+                      {" "}
+                      <Text
+                        fontSize="0.7rem"
+                        fontWeight="800"
+                        color={theme.colors.primary}
+                        mr="0.5rem"
+                      >
+                        1.
+                        {/* {`${tournament.creator}`} */}
+                      </Text>
+                      <Box alignItems="center" mr="0.5rem">
+                        <Image
+                          src={"/assets/ball.png"}
+                          alt="Default ball image"
+                          width={25}
+                          height={25}
+                          style={{ borderRadius: "50%" }}
+                        />
+                      </Box>
+                      <Text
+                        fontSize="0.7rem"
+                        fontWeight="800"
+                        color={theme.colors.primary}
+                        mr="0.5rem"
+                      >
+                        ...
+                        {/* {`${tournament.creator}`} */}
+                      </Text>
+                    </Flex>
+                    <Text
+                      fontSize="0.7rem"
+                      fontWeight="500"
+                      fontStyle="italic"
+                      color={theme.colors.primary}
+                      mr="0.5rem"
+                    >
+                      0
+                    </Text>
+                  </Flex>
+                  <Flex h="2rem" align="center" justifyContent="space-between">
+                    <Flex align="center">
+                      {" "}
+                      <Text
+                        fontSize="0.7rem"
+                        fontWeight="800"
+                        color={theme.colors.primary}
+                        mr="0.5rem"
+                      >
+                        1.
+                        {/* {`${tournament.creator}`} */}
+                      </Text>
+                      <Box alignItems="center" mr="0.5rem">
+                        <Image
+                          src={"/assets/ball.png"}
+                          alt="Default ball image"
+                          width={25}
+                          height={25}
+                          style={{ borderRadius: "50%" }}
+                        />
+                      </Box>
+                      <Text
+                        fontSize="0.7rem"
+                        fontWeight="800"
+                        color={theme.colors.primary}
+                        mr="0.5rem"
+                      >
+                        ...
+                        {/* {`${tournament.creator}`} */}
+                      </Text>
+                    </Flex>
+                    <Text
+                      fontSize="0.7rem"
+                      fontWeight="500"
+                      fontStyle="italic"
+                      color={theme.colors.primary}
+                      mr="0.5rem"
+                    >
+                      0
+                    </Text>
+                  </Flex>
+                </Flex>
+              </List>
+            </Flex>
+            <Flex w="100%" h="100%">
+              <Button
+                mb="1rem"
+                bg={theme.colors.green}
+                color="white"
+                width="100%"
+                borderColor={theme.colors.green}
+                borderWidth="2px"
+                borderRadius="1px"
+                h="2.25rem"
+                w="100%"
+                fontSize="0.8rem"
+                fontWeight="700"
+                isDisabled={false}
+                _hover={{
+                  bg: theme.colors.darkerGreen,
+                  borderColor: theme.colors.darkerGreen,
+                }}
+                onClick={() => setCreatingTournament(true)}
+              >
+                JOIN FOR ${selectedTournament.id}.00
+              </Button>
+            </Flex>
           </Flex>
-        </Flex>
+        )}
       </Flex>
     );
   }
@@ -667,7 +711,7 @@ export function Tournaments() {
                 <Controller
                   name="tournamentSize"
                   control={control}
-                  defaultValue={0}
+                  defaultValue={2}
                   rules={{ required: true }}
                   render={({ field }) => (
                     <Input
@@ -752,7 +796,7 @@ export function Tournaments() {
                   SEED PRIZE POOL (in $USD) *{" "}
                 </Text>
                 <Controller
-                  name="tournamentEntryFee"
+                  name="tournamentRewardAmount"
                   control={control}
                   defaultValue={0}
                   rules={{ required: true }}
@@ -777,54 +821,54 @@ export function Tournaments() {
                   )}
                 />
 
-                {errors.tournamentEntryFee && (
+                {errors.tournamentRewardAmount && (
                   <Flex w="97%" h="1rem" justifyContent="start" m="0" p="0">
                     <Text fontSize="0.75rem" color="red" m="0" p="0">
-                      Tournament entry fee is required
+                      Prize pool seed amount is required
                     </Text>
                   </Flex>
                 )}
               </Flex>
+              <Flex w="100%" gap="0.75rem" my="0.75rem">
+                <Button
+                  bg={theme.colors.red}
+                  color="white"
+                  width="100%"
+                  borderColor={theme.colors.red}
+                  borderWidth="2px"
+                  borderRadius="1px"
+                  h="2.25rem"
+                  w="100%"
+                  fontSize="0.8rem"
+                  fontWeight="700"
+                  isDisabled={false}
+                  _hover={{ bg: "#ea0000", borderColor: "#ea0000" }}
+                  onClick={() => setCreatingTournament(false)}
+                >
+                  CANCEL
+                </Button>
+                <Button
+                  bg={theme.colors.green}
+                  color="white"
+                  width="100%"
+                  borderColor={theme.colors.green}
+                  borderWidth="2px"
+                  borderRadius="1px"
+                  h="2.25rem"
+                  w="100%"
+                  fontSize="0.8rem"
+                  fontWeight="700"
+                  isDisabled={false}
+                  type="submit"
+                  _hover={{
+                    bg: theme.colors.darkerGreen,
+                    borderColor: theme.colors.darkerGreen,
+                  }}
+                >
+                  CREATE
+                </Button>
+              </Flex>
             </VStack>
-          </Flex>
-          <Flex w="100%" gap="0.75rem" mb="0.75rem">
-            <Button
-              bg={theme.colors.red}
-              color="white"
-              width="100%"
-              borderColor={theme.colors.red}
-              borderWidth="2px"
-              borderRadius="1px"
-              h="2.25rem"
-              w="100%"
-              fontSize="0.8rem"
-              fontWeight="700"
-              isDisabled={false}
-              _hover={{ bg: "#ea0000", borderColor: "#ea0000" }}
-              onClick={() => setCreatingTournament(false)}
-            >
-              CANCEL
-            </Button>
-            <Button
-              bg={theme.colors.green}
-              color="white"
-              width="100%"
-              borderColor={theme.colors.green}
-              borderWidth="2px"
-              borderRadius="1px"
-              h="2.25rem"
-              w="100%"
-              fontSize="0.8rem"
-              fontWeight="700"
-              isDisabled={false}
-              type="submit"
-              _hover={{
-                bg: theme.colors.darkerGreen,
-                borderColor: theme.colors.darkerGreen,
-              }}
-            >
-              CREATE
-            </Button>
           </Flex>
         </Flex>
       </Flex>
