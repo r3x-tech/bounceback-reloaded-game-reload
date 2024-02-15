@@ -543,449 +543,403 @@ export const LoginComponent = () => {
 
   return (
     <>
-      {!loggedIn && !loggedInStatus && !loginInProgress && !connecting ? (
-        <Button
-          leftIcon={
-            <Image
-              src="/solLogo.svg" // Path to Solana logo
-              alt="Solana Logo"
-              boxSize="1rem"
-              mr="0.25rem"
-            />
-          }
-          variant="outline"
+      <Menu
+        isOpen={showLoginModal}
+        onOpen={() => setShowLoginModal(true)}
+        onClose={() => setShowLoginModal(false)}
+      >
+        <MenuButton
+          as={Button}
+          fontFamily="Montserrat"
+          letterSpacing="1px"
+          fontSize="0.75rem"
+          fontWeight="700"
           borderColor="white"
           borderWidth="2px"
           borderRadius="0px"
+          h="2rem"
           color="white"
-          width="100%"
-          fontSize="0.75rem"
-          fontWeight="700"
           _hover={{
-            color: "black",
             backgroundColor: "white",
-            borderColor: "white",
+            color: "black",
           }}
-          isDisabled={loginInProgress}
-          onClick={() => {
-            if (!loggedInStatus && !loginInProgress && !connecting) {
-              handleSolanaLogin();
-            }
-          }}
-          isLoading={loginInProgress}
-          spinner={
-            <Flex flexDirection="row" align="center">
-              <Spinner color="background" size="sm" />
+          cursor="pointer"
+        >
+          {loggedInStatus
+            ? `${username.slice(0, 10)}...`
+            : loginInProgress || (connecting && !loggedInStatus)
+            ? "LOGGING IN..."
+            : "LOGIN"}
+        </MenuButton>
+        <MenuList
+          bg={theme.colors.black}
+          color={theme.colors.white}
+          borderColor={theme.colors.white}
+          borderRadius="0px"
+          borderWidth="2px"
+          w="360px"
+          outline="none"
+          zIndex={200}
+          boxShadow="1px 1px 20px black"
+        >
+          {loginInProgress || (connecting && !loggedInStatus) ? (
+            <Flex
+              w="100%"
+              flexDirection="column"
+              align="center"
+              justifyContent="center"
+              color={theme.colors.white}
+              mt="5.15rem"
+              mb="5rem"
+            >
+              <Spinner size="sm" />
+              <Text mt={3} fontSize="0.75rem" fontWeight="500">
+                LOGGING IN
+              </Text>
             </Flex>
-          }
-          _disabled={{
-            bg: "white",
-            cursor: "default",
-            borderColor: "#666666",
-          }}
-        >
-          LOGIN W/ SOLANA
-        </Button>
-      ) : (
-        <Menu
-          isOpen={showLoginModal}
-          onOpen={() => setShowLoginModal(true)}
-          onClose={() => setShowLoginModal(false)}
-        >
-          <MenuButton
-            as={Button}
-            fontFamily="Montserrat"
-            letterSpacing="1px"
-            fontSize="0.75rem"
-            fontWeight="700"
-            borderColor="white"
-            borderWidth="2px"
-            borderRadius="0px"
-            h="2rem"
-            color="white"
-            _hover={{
-              backgroundColor: "white",
-              color: "black",
-            }}
-            cursor="pointer"
-          >
-            {loggedInStatus
-              ? `${username.slice(0, 10)}...`
-              : loginInProgress || (connecting && !loggedInStatus)
-              ? "LOGGING IN..."
-              : "LOGIN"}
-          </MenuButton>
-          <MenuList
-            bg={theme.colors.black}
-            color={theme.colors.white}
-            borderColor={theme.colors.white}
-            borderRadius="0px"
-            borderWidth="2px"
-            w="360px"
-            outline="none"
-            zIndex={200}
-            boxShadow="1px 1px 20px black"
-          >
-            {loginInProgress || (connecting && !loggedInStatus) ? (
-              <Flex
-                w="100%"
-                flexDirection="column"
-                align="center"
-                justifyContent="center"
-                color={theme.colors.white}
-                mt="5.15rem"
-                mb="5rem"
-              >
-                <Spinner size="sm" />
-                <Text mt={3} fontSize="0.75rem" fontWeight="500">
-                  LOGGING IN
-                </Text>
-              </Flex>
-            ) : loggedInStatus ? (
-              <VStack spacing={4} padding="1rem" align="flex-start">
-                <Flex direction="column" align="flex-start" w="100%">
-                  <Flex m="0.75rem" align="center">
-                    <Box>
-                      <Image
-                        src={userProfilePic}
-                        alt="User Profile Pic"
-                        boxSize="3rem"
-                        mr="1rem"
-                        cursor="pointer"
-                        onClick={() => {
-                          // router.push("/account");
-                        }}
-                      />
-                    </Box>
-                    <Tooltip
-                      label="Wallet Address"
-                      aria-label="Wallet Address"
-                      bg="black"
-                      border="1px solid white"
-                    >
-                      <Text color="white">
-                        {formatWalletAddress(solana_wallet_address)}
-                      </Text>
-                      {/* <Text
+          ) : loggedInStatus ? (
+            <VStack spacing={4} padding="1rem" align="flex-start">
+              <Flex direction="column" align="flex-start" w="100%">
+                <Flex m="0.75rem" align="center">
+                  <Box>
+                    <Image
+                      src={userProfilePic}
+                      alt="User Profile Pic"
+                      boxSize="3rem"
+                      mr="1rem"
+                      cursor="pointer"
+                      onClick={() => {
+                        // router.push("/account");
+                      }}
+                    />
+                  </Box>
+                  <Tooltip
+                    label="Wallet Address"
+                    aria-label="Wallet Address"
+                    bg="black"
+                    border="1px solid white"
+                  >
+                    <Text color="white">
+                      {formatWalletAddress(solana_wallet_address)}
+                    </Text>
+                    {/* <Text
                     textAlign="center"
                     fontSize="0.75rem"
                     fontWeight="900"
                   >
                     {username.slice(0, 5)}...{username.slice(-10)}
                   </Text> */}
-                    </Tooltip>
+                  </Tooltip>
 
-                    <Tooltip
-                      label="Copy"
-                      aria-label="Copy"
-                      bg="black"
-                      border="1px solid white"
-                    >
-                      <Flex
-                        color="white"
-                        _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
-                      >
-                        <FaCopy
-                          style={{ marginLeft: "10px", cursor: "pointer" }}
-                          onClick={handleCopyClick}
-                        />
-                      </Flex>
-                    </Tooltip>
-                  </Flex>
-
-                  <Flex w="100%" h="100%" justifyContent="start" align="center">
+                  <Tooltip
+                    label="Copy"
+                    aria-label="Copy"
+                    bg="black"
+                    border="1px solid white"
+                  >
                     <Flex
-                      w="12.5rem"
-                      h="2.25rem"
-                      justifyContent="center"
-                      align="center"
-                    >
-                      <Text
-                        fontSize="0.9rem"
-                        fontWeight="700"
-                        color={theme.colors.primary}
-                      >
-                        Balance:
-                      </Text>
-                      <Text
-                        ml="0.5rem"
-                        fontSize="0.9rem"
-                        fontWeight="700"
-                        color={theme.colors.green}
-                      >
-                        ${`222`}.00 USD
-                      </Text>
-                    </Flex>
-
-                    <Button
-                      fontSize="0.75rem"
-                      fontWeight="700"
-                      as="a"
-                      href="https://www.r3x.tech/contact"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      variant="ghost"
-                      border="2px solid white"
-                      h="1.5rem"
-                      px="0.5rem"
-                      borderRadius="2px"
-                      _hover={{
-                        color: "rgba(255, 255, 255, 0.8)",
-                        borderColor: "rgba(255, 255, 255, 0.8)",
-                      }}
-                    >
-                      BUY MORE +
-                    </Button>
-                  </Flex>
-                  <Flex w="100%">
-                    <Button
-                      fontSize="0.9rem"
-                      fontWeight="700"
-                      as="a"
-                      href="https://www.r3x.tech/contact"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      variant="ghost"
+                      color="white"
                       _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
                     >
-                      Need Help?
-                    </Button>
+                      <FaCopy
+                        style={{ marginLeft: "10px", cursor: "pointer" }}
+                        onClick={handleCopyClick}
+                      />
+                    </Flex>
+                  </Tooltip>
+                </Flex>
+
+                <Flex w="100%" h="100%" justifyContent="start" align="center">
+                  <Flex
+                    w="12.5rem"
+                    h="2.25rem"
+                    justifyContent="center"
+                    align="center"
+                  >
+                    <Text
+                      fontSize="0.9rem"
+                      fontWeight="700"
+                      color={theme.colors.primary}
+                    >
+                      Balance:
+                    </Text>
+                    <Text
+                      ml="0.5rem"
+                      fontSize="0.9rem"
+                      fontWeight="700"
+                      color={theme.colors.green}
+                    >
+                      ${`222`}.00 USD
+                    </Text>
                   </Flex>
 
+                  <Button
+                    fontSize="0.75rem"
+                    fontWeight="700"
+                    as="a"
+                    href="https://www.r3x.tech/contact"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="ghost"
+                    border="2px solid white"
+                    h="1.5rem"
+                    px="0.5rem"
+                    borderRadius="2px"
+                    _hover={{
+                      color: "rgba(255, 255, 255, 0.8)",
+                      borderColor: "rgba(255, 255, 255, 0.8)",
+                    }}
+                  >
+                    BUY MORE +
+                  </Button>
+                </Flex>
+                <Flex w="100%">
                   <Button
                     fontSize="0.9rem"
                     fontWeight="700"
+                    as="a"
+                    href="https://www.r3x.tech/contact"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     variant="ghost"
-                    onClick={handleLogout}
-                    color={theme.colors.red}
-                    _hover={{ color: "rgba(255, 0, 0, 0.8)" }}
+                    _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
                   >
-                    Logout
+                    Need Help?
                   </Button>
                 </Flex>
-              </VStack>
-            ) : logoutStatus ? (
-              <Flex
-                w="100%"
-                flexDirection="column"
-                align="center"
-                justifyContent="center"
-                color={theme.colors.white}
-                mt="5.15rem"
-                mb="5rem"
-              >
-                <Spinner size="sm" />
-                <Text mt={3} fontSize="0.75rem" fontWeight="500">
-                  LOGGING OUT
-                </Text>
+
+                <Button
+                  fontSize="0.9rem"
+                  fontWeight="700"
+                  variant="ghost"
+                  onClick={handleLogout}
+                  color={theme.colors.red}
+                  _hover={{ color: "rgba(255, 0, 0, 0.8)" }}
+                >
+                  Logout
+                </Button>
               </Flex>
-            ) : (
-              <Stack
-                spacing={3}
-                width="100%"
-                p="1rem"
-                // bg={theme.colors.black}
-                // borderRadius="0px"
-                // border={`2px solid ${theme.colors.white}`}
-                // p="1.25rem"
-              >
-                <Flex flexDirection="column" w="100%">
-                  <Flex flexDirection="column" mb="1rem" w="100%" h="100%">
-                    <Flex flexDirection="row" w="100%">
-                      <Select
-                        w="30%"
-                        value={selectedCountryCode}
-                        onChange={(e) => setSelectedCountryCode(e.target.value)}
-                        bg={theme.colors.input}
-                        color={theme.colors.white}
-                        fontSize="0.75rem"
-                        iconSize="0px"
-                        border={theme.colors.input}
-                        background={`url("data:image/svg+xml,%3Csvg width='8' height='4' viewBox='0 0 8 4' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.646447 0.646447C0.841709 0.451184 1.15829 0.451184 1.35355 0.646447L4 3.29289L6.64645 0.646446C6.84171 0.451184 7.15829 0.451184 7.35355 0.646446C7.54882 0.841709 7.54882 1.15829 7.35355 1.35355L4.35355 4.35355C4.15829 4.54882 3.84171 4.54882 3.64645 4.35355L0.646446 1.35355C0.451184 1.15829 0.451184 0.841709 0.646447 0.646447Z' fill='white'/%3E%3C/svg%3E%0A") no-repeat right 1rem center/8px 4px ${theme.colors.input}`}
-                        borderRadius="2px 0 0 2px"
-                        outline="none"
-                        _focus={{
-                          boxShadow: "none",
-                          background: `url("data:image/svg+xml,%3Csvg width='8' height='4' viewBox='0 0 8 4' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.646447 0.646447C0.841709 0.451184 1.15829 0.451184 1.35355 0.646447L4 3.29289L6.64645 0.646446C6.84171 0.451184 7.15829 0.451184 7.35355 0.646446C7.54882 0.841709 7.54882 1.15829 7.35355 1.35355L4.35355 4.35355C4.15829 4.54882 3.84171 4.54882 3.64645 4.35355L0.646446 1.35355C0.451184 1.15829 0.451184 0.841709 0.646447 0.646447Z' fill='white'/%3E%3C/svg%3E%0A") no-repeat right 1rem center/8px 4px ${theme.colors.input}`,
-                        }}
-                      >
-                        {Object.entries(countryPhoneCodes).map(
-                          ([iso, code]) => (
-                            <option key={iso} value={code}>
-                              {code} {countryCodeToFlagEmoji(iso)} {iso}
-                            </option>
-                          )
-                        )}
-                      </Select>
+            </VStack>
+          ) : logoutStatus ? (
+            <Flex
+              w="100%"
+              flexDirection="column"
+              align="center"
+              justifyContent="center"
+              color={theme.colors.white}
+              mt="5.15rem"
+              mb="5rem"
+            >
+              <Spinner size="sm" />
+              <Text mt={3} fontSize="0.75rem" fontWeight="500">
+                LOGGING OUT
+              </Text>
+            </Flex>
+          ) : (
+            <Stack
+              spacing={3}
+              width="100%"
+              p="1rem"
+              // bg={theme.colors.black}
+              // borderRadius="0px"
+              // border={`2px solid ${theme.colors.white}`}
+              // p="1.25rem"
+            >
+              <Flex flexDirection="column" w="100%">
+                <Flex flexDirection="column" mb="1rem" w="100%" h="100%">
+                  <Flex flexDirection="row" w="100%">
+                    <Select
+                      w="30%"
+                      value={selectedCountryCode}
+                      onChange={(e) => setSelectedCountryCode(e.target.value)}
+                      bg={theme.colors.input}
+                      color={theme.colors.white}
+                      fontSize="0.75rem"
+                      iconSize="0px"
+                      border={theme.colors.input}
+                      background={`url("data:image/svg+xml,%3Csvg width='8' height='4' viewBox='0 0 8 4' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.646447 0.646447C0.841709 0.451184 1.15829 0.451184 1.35355 0.646447L4 3.29289L6.64645 0.646446C6.84171 0.451184 7.15829 0.451184 7.35355 0.646446C7.54882 0.841709 7.54882 1.15829 7.35355 1.35355L4.35355 4.35355C4.15829 4.54882 3.84171 4.54882 3.64645 4.35355L0.646446 1.35355C0.451184 1.15829 0.451184 0.841709 0.646447 0.646447Z' fill='white'/%3E%3C/svg%3E%0A") no-repeat right 1rem center/8px 4px ${theme.colors.input}`}
+                      borderRadius="2px 0 0 2px"
+                      outline="none"
+                      _focus={{
+                        boxShadow: "none",
+                        background: `url("data:image/svg+xml,%3Csvg width='8' height='4' viewBox='0 0 8 4' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.646447 0.646447C0.841709 0.451184 1.15829 0.451184 1.35355 0.646447L4 3.29289L6.64645 0.646446C6.84171 0.451184 7.15829 0.451184 7.35355 0.646446C7.54882 0.841709 7.54882 1.15829 7.35355 1.35355L4.35355 4.35355C4.15829 4.54882 3.84171 4.54882 3.64645 4.35355L0.646446 1.35355C0.451184 1.15829 0.451184 0.841709 0.646447 0.646447Z' fill='white'/%3E%3C/svg%3E%0A") no-repeat right 1rem center/8px 4px ${theme.colors.input}`,
+                      }}
+                    >
+                      {Object.entries(countryPhoneCodes).map(([iso, code]) => (
+                        <option key={iso} value={code}>
+                          {code} {countryCodeToFlagEmoji(iso)} {iso}
+                        </option>
+                      ))}
+                    </Select>
 
-                      <Input
-                        bg={theme.colors.input}
-                        w="70%"
-                        borderRadius="0px 2px 2px 0px"
-                        border={theme.colors.input}
-                        borderLeft={`4px solid ${theme.colors.black}`}
-                        fontWeight="500"
-                        fontSize="0.7rem"
-                        letterSpacing="0.5px"
-                        color={theme.colors.white}
-                        focusBorderColor={theme.colors.white}
-                        _placeholder={{ color: theme.colors.darkerGray }}
-                        isDisabled={loginInProgress || username.length > 0}
-                        onChange={(e) => {
-                          if (phoneError) setPhoneError(false);
-                          setPhone(e.target.value);
-                        }}
-                        placeholder={"ENTER A PHONE NUMBER"}
-                        value={phone}
-                        isInvalid={phoneError}
-                        errorBorderColor={theme.red[700]}
-                        _focus={{
-                          boxShadow: "none",
-                          borderLeft: `4px solid ${theme.colors.black}`,
-                        }}
-                      />
-                    </Flex>
-
-                    {phoneError && (
-                      <Text
-                        className="error"
-                        color={theme.red[700]}
-                        fontSize="0.75rem"
-                      >
-                        Please enter a valid phone number
-                      </Text>
-                    )}
+                    <Input
+                      bg={theme.colors.input}
+                      w="70%"
+                      borderRadius="0px 2px 2px 0px"
+                      border={theme.colors.input}
+                      borderLeft={`4px solid ${theme.colors.black}`}
+                      fontWeight="500"
+                      fontSize="0.7rem"
+                      letterSpacing="0.5px"
+                      color={theme.colors.white}
+                      focusBorderColor={theme.colors.white}
+                      _placeholder={{ color: theme.colors.darkerGray }}
+                      isDisabled={loginInProgress || username.length > 0}
+                      onChange={(e) => {
+                        if (phoneError) setPhoneError(false);
+                        setPhone(e.target.value);
+                      }}
+                      placeholder={"ENTER A PHONE NUMBER"}
+                      value={phone}
+                      isInvalid={phoneError}
+                      errorBorderColor={theme.red[700]}
+                      _focus={{
+                        boxShadow: "none",
+                        borderLeft: `4px solid ${theme.colors.black}`,
+                      }}
+                    />
                   </Flex>
 
-                  <Button
-                    leftIcon={<FaPhoneAlt size="1rem" />}
-                    bg={theme.colors.white}
-                    color={theme.colors.black}
-                    borderRadius="0px"
-                    letterSpacing="1px"
-                    fontSize="0.75rem"
-                    fontWeight="700"
-                    w="100%"
-                    isDisabled={
-                      loginInProgress ||
-                      (username.length > 0 ? false : phone.length === 0)
-                    }
-                    onClick={() => handlePhoneLogin()}
-                    isLoading={loginInProgress}
-                    spinner={
-                      <Flex flexDirection="row" align="center">
-                        <Spinner color={theme.colors.background} size="sm" />
-                      </Flex>
-                    }
-                    _disabled={{
-                      bg: "#666666",
-                      cursor: "default",
-                    }}
-                  >
-                    LOGIN W/ PHONE
-                  </Button>
+                  {phoneError && (
+                    <Text
+                      className="error"
+                      color={theme.red[700]}
+                      fontSize="0.75rem"
+                    >
+                      Please enter a valid phone number
+                    </Text>
+                  )}
                 </Flex>
-                <Flex w="100%" justifyContent="center" my="0" py="0">
-                  <Text
-                    fontWeight="500"
-                    fontSize="0.75rem"
-                    color={theme.colors.white}
-                    py="0"
-                    my="0"
-                  >
-                    OR{" "}
-                  </Text>
-                </Flex>
-                <Flex
-                  flexDirection={["column", "column"]}
-                  justifyContent="center"
+
+                <Button
+                  leftIcon={<FaPhoneAlt size="1rem" />}
+                  bg={theme.colors.white}
+                  color={theme.colors.black}
+                  borderRadius="0px"
+                  letterSpacing="1px"
+                  fontSize="0.75rem"
+                  fontWeight="700"
                   w="100%"
-                  mt="0rem"
-                  gap={3}
+                  isDisabled={
+                    loginInProgress ||
+                    (username.length > 0 ? false : phone.length === 0)
+                  }
+                  onClick={() => handlePhoneLogin()}
+                  isLoading={loginInProgress}
+                  spinner={
+                    <Flex flexDirection="row" align="center">
+                      <Spinner color={theme.colors.background} size="sm" />
+                    </Flex>
+                  }
+                  _disabled={{
+                    bg: "#666666",
+                    cursor: "default",
+                  }}
                 >
-                  <Button
-                    leftIcon={
-                      <Image
-                        src="/googleLogo.webp"
-                        alt="Google Logo"
-                        boxSize="1rem"
-                        mr="0.25rem"
-                      />
-                    }
-                    variant="outline"
-                    borderColor={theme.colors.white}
-                    border="2px solid white"
-                    borderRadius="0px"
-                    color={theme.colors.white}
-                    width="100%"
-                    fontSize="0.75rem"
-                    fontWeight="700"
-                    _hover={{
-                      color: theme.colors.black,
-                      backgroundColor: theme.colors.white,
-                      borderColor: theme.colors.white,
-                    }}
-                    isDisabled={loginInProgress}
-                    onClick={() => handleGoogleLogin()}
-                    isLoading={loginInProgress}
-                    spinner={
-                      <Flex flexDirection="row" align="center">
-                        <Spinner color={theme.colors.background} size="sm" />
-                      </Flex>
-                    }
-                    _disabled={{
-                      bg: "#fffff",
-                      cursor: "default",
-                      borderColor: "#666666",
-                    }}
-                  >
-                    LOGIN W/ GOOGLE
-                  </Button>
+                  LOGIN W/ PHONE
+                </Button>
+              </Flex>
+              <Flex w="100%" justifyContent="center" my="0" py="0">
+                <Text
+                  fontWeight="500"
+                  fontSize="0.75rem"
+                  color={theme.colors.white}
+                  py="0"
+                  my="0"
+                >
+                  OR{" "}
+                </Text>
+              </Flex>
+              <Flex
+                flexDirection={["column", "column"]}
+                justifyContent="center"
+                w="100%"
+                mt="0rem"
+                gap={3}
+              >
+                <Button
+                  leftIcon={
+                    <Image
+                      src="/googleLogo.webp"
+                      alt="Google Logo"
+                      boxSize="1rem"
+                      mr="0.25rem"
+                    />
+                  }
+                  variant="outline"
+                  borderColor={theme.colors.white}
+                  border="2px solid white"
+                  borderRadius="0px"
+                  color={theme.colors.white}
+                  width="100%"
+                  fontSize="0.75rem"
+                  fontWeight="700"
+                  _hover={{
+                    color: theme.colors.black,
+                    backgroundColor: theme.colors.white,
+                    borderColor: theme.colors.white,
+                  }}
+                  isDisabled={loginInProgress}
+                  onClick={() => handleGoogleLogin()}
+                  isLoading={loginInProgress}
+                  spinner={
+                    <Flex flexDirection="row" align="center">
+                      <Spinner color={theme.colors.background} size="sm" />
+                    </Flex>
+                  }
+                  _disabled={{
+                    bg: "#fffff",
+                    cursor: "default",
+                    borderColor: "#666666",
+                  }}
+                >
+                  LOGIN W/ GOOGLE
+                </Button>
 
-                  <Button
-                    leftIcon={
-                      <Image
-                        src="/solLogo.svg" // Path to Solana logo
-                        alt="Solana Logo"
-                        boxSize="1rem"
-                        mr="0.25rem"
-                      />
+                <Button
+                  leftIcon={
+                    <Image
+                      src="/solLogo.svg" // Path to Solana logo
+                      alt="Solana Logo"
+                      boxSize="1rem"
+                      mr="0.25rem"
+                    />
+                  }
+                  variant="outline"
+                  borderColor="white"
+                  borderWidth="2px"
+                  borderRadius="0px"
+                  color="white"
+                  width="100%"
+                  fontSize="0.75rem"
+                  fontWeight="700"
+                  _hover={{
+                    color: "black",
+                    backgroundColor: "white",
+                    borderColor: "white",
+                  }}
+                  isDisabled={loginInProgress}
+                  onClick={() => {
+                    if (!loggedInStatus && !loginInProgress && !connecting) {
+                      handleSolanaLogin();
                     }
-                    variant="outline"
-                    borderColor="white"
-                    borderWidth="2px"
-                    borderRadius="0px"
-                    color="white"
-                    width="100%"
-                    fontSize="0.75rem"
-                    fontWeight="700"
-                    _hover={{
-                      color: "black",
-                      backgroundColor: "white",
-                      borderColor: "white",
-                    }}
-                    isDisabled={loginInProgress}
-                    onClick={() => {
-                      if (!loggedInStatus && !loginInProgress && !connecting) {
-                        handleSolanaLogin();
-                      }
-                    }}
-                    isLoading={loginInProgress}
-                    spinner={
-                      <Flex flexDirection="row" align="center">
-                        <Spinner color="background" size="sm" />
-                      </Flex>
-                    }
-                    _disabled={{
-                      bg: "white",
-                      cursor: "default",
-                      borderColor: "#666666",
-                    }}
-                  >
-                    LOGIN W/ SOLANA
-                  </Button>
+                  }}
+                  isLoading={loginInProgress}
+                  spinner={
+                    <Flex flexDirection="row" align="center">
+                      <Spinner color="background" size="sm" />
+                    </Flex>
+                  }
+                  _disabled={{
+                    bg: "white",
+                    cursor: "default",
+                    borderColor: "#666666",
+                  }}
+                >
+                  LOGIN W/ SOLANA
+                </Button>
 
-                  {/* <BaseWalletMultiButton
+                {/* <BaseWalletMultiButton
                 startIcon={
                   <Image
                     src="/solLogo.svg"
@@ -999,12 +953,11 @@ export const LoginComponent = () => {
                 }
                 labels={LABELS}
               /> */}
-                </Flex>
-              </Stack>
-            )}
-          </MenuList>
-        </Menu>
-      )}
+              </Flex>
+            </Stack>
+          )}
+        </MenuList>
+      </Menu>
     </>
   );
 };

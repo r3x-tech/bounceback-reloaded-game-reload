@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import Router from "next/router";
 import withGA from "next-ga";
 import { Analytics } from "@vercel/analytics/react";
+import { ParticleProvider } from "@/contexts/ParticleProvider";
 
 const queryClient = new QueryClient();
 
@@ -20,7 +21,6 @@ function App({ Component, pageProps }: AppProps) {
           <QueryClientProvider client={queryClient}>
             <Component {...pageProps} />
             <Analytics />
-
             <Toaster />
           </QueryClientProvider>
         </ChakraProvider>
