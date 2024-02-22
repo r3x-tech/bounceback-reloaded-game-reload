@@ -1,5 +1,5 @@
-import { AnchorProvider, Wallet } from "@project-serum/anchor";
-import { AnchorWallet } from "@solana/wallet-adapter-react";
+import { Wallet } from "@/types/Wallet";
+import { AnchorProvider } from "@project-serum/anchor";
 import { Connection } from "@solana/web3.js";
 import { create } from "zustand";
 
@@ -12,7 +12,7 @@ type Store = {
   signTransaction: any | null;
   signAllTransactions: any | null;
   currentProvider: AnchorProvider | null;
-  currentWallet: AnchorWallet | null;
+  currentWallet: Wallet | null;
   ip_address: string;
   userProfilePic: string;
   setLogin: (
@@ -24,7 +24,7 @@ type Store = {
     signTransaction: any | null,
     signAllTransactions: any | null,
     currentProvider: AnchorProvider | null,
-    currentWallet: AnchorWallet | null,
+    currentWallet: Wallet | null,
     ip_address: string
   ) => void;
 };

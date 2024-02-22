@@ -1,13 +1,13 @@
 import { Solana } from "@raindrop-studios/events-client";
-import { AnchorProvider, Wallet } from "@project-serum/anchor";
+import { AnchorProvider } from "@project-serum/anchor";
 import { Connection } from "@solana/web3.js";
 import { supabase } from "@/supabaseClient";
-import { AnchorWallet } from "@solana/wallet-adapter-react";
+import { Wallet } from "@/types/Wallet";
 
 export async function createTournament(
   tournamentName: string,
   participantLimit: number,
-  wallet: AnchorWallet,
+  wallet: Wallet,
   connection: Connection,
   entryFee: Solana.Rpc.Events.EntryFee,
   rewardAmount: number

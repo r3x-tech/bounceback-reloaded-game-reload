@@ -50,7 +50,7 @@ const baseButtonStyle: CSSProperties = {
   cursor: "pointer",
   letterSpacing: "0.5px",
   backgroundColor: "transparent",
-  // width: "100%",
+  width: "100%",
 };
 
 const hoverButtonStyle: CSSProperties = {

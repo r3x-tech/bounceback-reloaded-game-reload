@@ -1,9 +1,5 @@
 import { useScoreStore } from "../../stores/useScoreStore";
-import { saveHighScore } from "../../utils/saveHighScore";
 import { useGameOverModalStore } from "../../stores/useGameOverModalStore";
-import { useLoadingStore } from "../../stores/useLoadingStore";
-import MainScene from "./MainScene";
-import userStore from "@/stores/userStore";
 
 class GameOverScene extends Phaser.Scene {
   private restartButton!: Phaser.GameObjects.Sprite;

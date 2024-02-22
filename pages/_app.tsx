@@ -10,12 +10,13 @@ import Router from "next/router";
 import withGA from "next-ga";
 import { Analytics } from "@vercel/analytics/react";
 import { ParticleProvider } from "@/contexts/ParticleProvider";
+import { ParticleContextProvider } from "@/contexts/ParticleContextProvider";
 
 const queryClient = new QueryClient();
 
 function App({ Component, pageProps }: AppProps) {
   return (
-    <MagicProvider>
+    <ParticleContextProvider>
       <SolanaProvider>
         <ChakraProvider theme={theme}>
           <QueryClientProvider client={queryClient}>
@@ -25,7 +26,7 @@ function App({ Component, pageProps }: AppProps) {
           </QueryClientProvider>
         </ChakraProvider>
       </SolanaProvider>
-    </MagicProvider>
+    </ParticleContextProvider>
   );
 }
 

@@ -904,17 +904,6 @@ export function Tournaments() {
                 p={3}
                 mb={3}
                 backgroundColor="#1A1A1D"
-                cursor="pointer"
-                onClick={() =>
-                  selectTournament({
-                    id: 1,
-                    game_name: "name",
-                    tournament_name: "tourn name",
-                    start_datetime: "start",
-                    end_datetime: "end",
-                    tournament_link: "link",
-                  })
-                }
               >
                 <VStack
                   h="100%"
@@ -1035,8 +1024,19 @@ export function Tournaments() {
                         fontSize="12px"
                         color={theme.colors.pink}
                         fontWeight="bold"
+                        cursor="pointer"
+                        onClick={() =>
+                          selectTournament({
+                            id: 1,
+                            game_name: "name",
+                            tournament_name: "tourn name",
+                            start_datetime: "start",
+                            end_datetime: "end",
+                            tournament_link: "link",
+                          })
+                        }
                       >
-                        {`AWAITING PLAYERS`}
+                        {`AWAITING PLAYERS >`}
                       </Text>
                       {/* <Text
                         fontSize="12px"

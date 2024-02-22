@@ -7,7 +7,7 @@ import { FC, ReactNode, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
-  BackpackWalletAdapter,
+  // BackpackWalletAdapter,
   ParticleAdapter,
   ParticleAdapterConfig,
   PhantomWalletAdapter,
