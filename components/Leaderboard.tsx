@@ -106,7 +106,7 @@ export function Leaderboard() {
               ) : (
                 <Text
                   color="#fbfbfb"
-                  textAlign="start"
+                  textAlign="center"
                   my="10px"
                   fontSize="0.8rem"
                 >
@@ -116,7 +116,12 @@ export function Leaderboard() {
             </List>
           </TabPanel>
           <TabPanel py={0} px={0} height="calc(22rem - 6rem)" overflowY="auto">
-            <Text color="#fbfbfb" textAlign="start" my="10px" fontSize="0.8rem">
+            <Text
+              color="#fbfbfb"
+              textAlign="center"
+              my="10px"
+              fontSize="0.8rem"
+            >
               {/* LOGIN TO VIEW PERSONAL LEADERBOARD */}
               PERSONAL LEADERBOARD COMING SOON
             </Text>
