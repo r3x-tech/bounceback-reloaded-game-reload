@@ -3,7 +3,6 @@ import { AppProps } from "next/app";
 import theme from "@/styles/theme";
 import "../styles/globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import MagicProvider from "@/contexts/MagicProvider";
 import { SolanaProvider } from "@/contexts/SolanaProvider";
 import { Toaster } from "react-hot-toast";
 import Router from "next/router";

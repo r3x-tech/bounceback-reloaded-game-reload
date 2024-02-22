@@ -28,8 +28,6 @@ import {
 } from "@chakra-ui/react";
 import ipify from "ipify";
 import { useEffect, useState } from "react";
-import { RPCError, RPCErrorCode } from "magic-sdk";
-import { useMagic } from "@/contexts/MagicProvider";
 import theme from "../styles/theme";
 import userStore from "@/stores/userStore";
 import toast from "react-hot-toast";
@@ -372,9 +370,7 @@ export const LoginComponent = () => {
                     solanaWallet.publicKey?.toBase58() || "",
                   currentConnection: particle.solana.getRpcUrl()
                     ? new Connection(particle.solana.getRpcUrl())
-                    : null, // signTransaction: signMagicTransaction,
-                  // signAllTransactions: signAllMagicTransactions,
-                  // currentProvider: provider,
+                    : null,
                   currentWallet: {
                     publicKey: new PublicKey(
                       solanaWallet!.publicKey!.toBase58()
@@ -391,18 +387,6 @@ export const LoginComponent = () => {
           }
         } catch (e) {
           console.log("login error: " + JSON.stringify(e));
-          if (e instanceof RPCError) {
-            switch (e.code) {
-              case RPCErrorCode.MagicLinkFailedVerification:
-              case RPCErrorCode.MagicLinkExpired:
-              case RPCErrorCode.MagicLinkRateLimited:
-              case RPCErrorCode.UserAlreadyLoggedIn:
-                toast.error(`${e.message}`);
-                break;
-              default:
-                toast.error("Something went wrong. Please try again");
-            }
-          }
         } finally {
           setLoginInProgress(false);
         }
