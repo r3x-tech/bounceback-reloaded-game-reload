@@ -5,7 +5,7 @@ class StartScene extends Phaser.Scene {
 
   preload() {
     this.load.image("bouncebacklogo", "../assets/bouncebackreloadedlogo.svg");
-    this.load.image("background", "../assets/bg.svg");
+    this.load.image("background", "../assets/home.svg");
   }
 
   create() {
