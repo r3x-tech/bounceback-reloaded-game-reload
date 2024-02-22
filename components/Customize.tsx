@@ -15,7 +15,7 @@ import {
   Tabs,
   Textarea,
 } from "@chakra-ui/react";
-import { Tournament, getTournamentsByGameName } from "../utils/getTournaments";
+import { Tournament, getTournamentsByGameName } from "../utils/tournament";
 import theme from "@/styles/theme";
 import Link from "next/link";
 import { useLoadingStore } from "@/stores/useLoadingStore";

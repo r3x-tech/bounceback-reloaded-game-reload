@@ -27,7 +27,6 @@ import { createTournament } from "@/utils/tournament";
 import { BN, AnchorProvider } from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
 import * as web3 from "@solana/web3.js";
-import { useMagic } from "@/contexts/MagicProvider";
 import { useLoadingStore } from "@/stores/useLoadingStore";
 
 dayjs.extend(duration);
@@ -43,8 +42,6 @@ export function Tournaments() {
     ip_address,
     userProfilePic,
   } = userStore();
-
-  const { magic } = useMagic();
 
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [selectedTournament, setSelectedTournament] =
