@@ -5,7 +5,6 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
-  BackpackWalletAdapter,
   PhantomWalletAdapter,
   UnsafeBurnerWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
