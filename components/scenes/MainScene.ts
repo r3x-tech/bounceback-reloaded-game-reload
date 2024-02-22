@@ -57,8 +57,8 @@ export default class MainScene extends Phaser.Scene {
     floor.setDepth(1);
 
     this.ball = this.physics.add.sprite(175, 175, "ball").setCircle(15);
-    this.ball.displayWidth = 10;
-    this.ball.displayHeight = 10;
+    this.ball.displayWidth = 12;
+    this.ball.displayHeight = 12;
     this.ball.setSize(5, 5);
     this.ball.setBounce(0, 0);
     this.ball.setCollideWorldBounds(true, 1, 1, true);
