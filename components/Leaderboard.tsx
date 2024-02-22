@@ -71,13 +71,8 @@ export function Leaderboard() {
         </TabList>
 
         <TabPanels p={0} m={0}>
-          <TabPanel
-            py={0}
-            px={0}
-            maxHeight="calc(22rem - 6rem)"
-            overflowY="auto"
-          >
-            <List m="0rem" p="0" width="100%" bg="red">
+          <TabPanel py={0} px={0} height="calc(22rem - 6rem)" overflowY="auto">
+            <List m="0rem" p="0" width="100%">
               {topScores.length > 0 ? (
                 <Stack spacing="1rem">
                   {" "}
@@ -115,18 +110,13 @@ export function Leaderboard() {
                   my="10px"
                   fontSize="0.8rem"
                 >
-                  NO SAVED SCORES FOUND
+                  NO SAVED SCORES FOUND{" "}
                 </Text>
               )}
             </List>
           </TabPanel>
-          <TabPanel py={2}>
-            <Text
-              color="#fbfbfb"
-              textAlign="center"
-              my="10px"
-              fontSize="0.8rem"
-            >
+          <TabPanel py={0} px={0} height="calc(22rem - 6rem)" overflowY="auto">
+            <Text color="#fbfbfb" textAlign="start" my="10px" fontSize="0.8rem">
               {/* LOGIN TO VIEW PERSONAL LEADERBOARD */}
               PERSONAL LEADERBOARD COMING SOON
             </Text>
