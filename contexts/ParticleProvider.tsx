@@ -5,20 +5,21 @@
 // } from "@solana/wallet-adapter-react";
 // import { FC, ReactNode, useCallback, useMemo } from "react";
 // import dynamic from "next/dynamic";
-// import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-// import {
-//   // BackpackWalletAdapter,
-//   ParticleAdapter,
-//   ParticleAdapterConfig,
-//   PhantomWalletAdapter,
-//   SolflareWalletAdapter,
-// } from "@solana/wallet-adapter-wallets";
+// import { AuthType } from "@particle-network/auth-core";
+// import { Solana } from "@particle-network/chains";
+// import { PromptSettingType } from "@particle-network/auth-core-modal";
 
-// const ReactUIWalletModalProviderDynamic = dynamic(
+// const NoSSRAuthCoreContextProvider = dynamic(
 //   async () =>
-//     (await import("@solana/wallet-adapter-react-ui")).WalletModalProvider,
+//     (await import("@particle-network/auth-core-modal")).AuthCoreContextProvider,
 //   { ssr: false }
 // );
+
+// // // Dynamically import to avoid SSR issues
+// // const NoSSRAuthCoreContextProvider = dynamic(
+// //   () => Promise.resolve(AuthCoreContextProvider),
+// //   { ssr: false }
+// // );
 
 // require("@solana/wallet-adapter-react-ui/styles.css");
 
@@ -26,18 +27,7 @@
 //   const endpoint = process.env.NEXT_PUBLIC_ENDPOINT;
 
 //   const wallets = useMemo(() => {
-//     const particleConfig: ParticleAdapterConfig = {
-//       config: {
-//         projectId: "a54076a8-8c47-4055-8090-30ba53356593",
-//         clientKey: "cYy4WdR9w5DfBsoWvmGsSQFWPADTffgIaCrDtZzk",
-//         appId: "a49face1-9729-4464-90b1-51cd85c0604f",
-//         chainName: "solana",
-//         chainId: 101,
-//         // authUrl: "https://bouncebackreloaded.r3x.tech/",
-//       },
-//     };
-
-//     return [new ParticleAdapter(particleConfig)];
+//     return [];
 //   }, []);
 
 //   const onError = useCallback((error: WalletError) => {
@@ -45,12 +35,28 @@
 //   }, []);
 
 //   return (
-//     <ConnectionProvider endpoint={endpoint as string}>
-//       <WalletProvider wallets={wallets} onError={onError}>
-//         <ReactUIWalletModalProviderDynamic>
-//           {children}
-//         </ReactUIWalletModalProviderDynamic>
-//       </WalletProvider>
-//     </ConnectionProvider>
+//     <NoSSRAuthCoreContextProvider
+//       options={{
+//         projectId: process.env.NEXT_PUBLIC_PROJECT_ID!,
+//         clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY!,
+//         appId: process.env.NEXT_PUBLIC_APP_ID!,
+//         authTypes: [AuthType.email],
+//         themeType: "dark",
+//         fiatCoin: "USD",
+//         language: "en",
+//         promptSettingConfig: {
+//           promptPaymentPasswordSettingWhenSign: PromptSettingType.first,
+//           promptMasterPasswordSettingWhenLogin: PromptSettingType.first,
+//         },
+//         wallet: {
+//           visible: false,
+//           customStyle: {
+//             supportChains: [Solana],
+//           },
+//         },
+//       }}
+//     >
+//       {children}
+//     </NoSSRAuthCoreContextProvider>
 //   );
 // };

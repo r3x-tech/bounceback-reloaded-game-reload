@@ -35,24 +35,7 @@ export const SolanaProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   return (
     <ConnectionProvider endpoint={endpoint as string}>
-      <WalletProvider
-        wallets={[
-          new PhantomWalletAdapter(),
-          // new BackpackWalletAdapter(),
-          new SolflareWalletAdapter(),
-          // new ParticleAdapter({
-          //   config: {
-          //     projectId: "a54076a8-8c47-4055-8090-30ba53356593",
-          //     clientKey: "cYy4WdR9w5DfBsoWvmGsSQFWPADTffgIaCrDtZzk",
-          //     appId: "a49face1-9729-4464-90b1-51cd85c0604f",
-          //     chainName: "solana",
-          //     chainId: 101,
-          //     // authUrl: "https://bouncebackreloaded.r3x.tech/",
-          //   },
-          // }),
-        ]}
-        onError={onError}
-      >
+      <WalletProvider wallets={[]} onError={onError}>
         <ReactUIWalletModalProviderDynamic>
           {children}
         </ReactUIWalletModalProviderDynamic>
