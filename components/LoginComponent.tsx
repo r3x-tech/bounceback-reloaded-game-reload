@@ -259,7 +259,7 @@ export const LoginComponent = () => {
           } else {
             console.log("no account");
           }
-        } catch (e) {
+        } catch (e: any) {
           console.log("login error: " + JSON.stringify(e));
           if (e instanceof RPCError) {
             switch (e.code) {
