@@ -56,7 +56,6 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import BaseWalletMultiButton from "./auth/BaseWalletMultiButton";
 import { useParticle } from "../contexts/ParticleContextProvider";
 import { UserInfo } from "@particle-network/auth";
-import { useSolana } from "@particle-network/auth-core-modal";
 
 const LABELS = {
   "change-wallet": "CHANGE WALLET",
