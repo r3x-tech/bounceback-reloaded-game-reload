@@ -18,9 +18,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <SolanaProvider>
       <ChakraProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
-          {/* <ParticleProvider> */}
           <Component {...pageProps} />
-          {/* </ParticleProvider> */}
           <Analytics />
           <Toaster />
         </QueryClientProvider>

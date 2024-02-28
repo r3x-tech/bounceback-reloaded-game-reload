@@ -13,11 +13,11 @@ class GameOverScene extends Phaser.Scene {
     this.load.image("playagain", "../assets/playagain.svg");
     this.load.image("savegame", "../assets/savenewhighscore.svg");
     this.load.image("loginsavegame", "../assets/loginsavegame.svg");
-    this.load.image("background", "../assets/bg.svg");
+    this.load.image("background2", "../assets/bg.svg");
   }
 
   create(data: any) {
-    const bg = this.add.image(0, 0, "background").setOrigin(0, 0);
+    const bg = this.add.image(0, 0, "background2").setOrigin(0, 0);
     bg.displayWidth = this.sys.canvas.width;
     bg.displayHeight = this.sys.canvas.height;
 
