@@ -3,11 +3,14 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import { FC, ReactNode, useCallback, useMemo } from "react";
+import { FC, ReactNode, useCallback, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { AuthType } from "@particle-network/auth-core";
 import { Solana } from "@particle-network/chains";
-import { PromptSettingType } from "@particle-network/auth-core-modal";
+import {
+  PromptSettingType,
+  useSolana,
+} from "@particle-network/auth-core-modal";
 
 const NoSSRAuthCoreContextProvider = dynamic(
   async () =>
@@ -34,13 +37,19 @@ export const ParticleProvider: FC<{ children: ReactNode }> = ({ children }) => {
     console.error("Wallet error: " + error);
   }, []);
 
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     window.solana = particleProvider;
+  //   }
+  // }, []);
+
   return (
     <NoSSRAuthCoreContextProvider
       options={{
         projectId: process.env.NEXT_PUBLIC_PROJECT_ID!,
         clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY!,
         appId: process.env.NEXT_PUBLIC_APP_ID!,
-        authTypes: [AuthType.email],
+        authTypes: [AuthType.phone],
         themeType: "dark",
         fiatCoin: "USD",
         language: "en",

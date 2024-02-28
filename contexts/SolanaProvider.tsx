@@ -5,14 +5,6 @@ import {
 } from "@solana/wallet-adapter-react";
 import { FC, ReactNode, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import {
-  // BackpackWalletAdapter,
-  ParticleAdapter,
-  ParticleAdapterConfig,
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-} from "@solana/wallet-adapter-wallets";
 
 const ReactUIWalletModalProviderDynamic = dynamic(
   async () =>

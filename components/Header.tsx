@@ -13,7 +13,7 @@ import {
 import theme from "@/styles/theme";
 import { MdLeaderboard } from "react-icons/md";
 import { WalletMultiButton } from "./auth/WalletMultiButton";
-// import { LoginComponent } from "./LoginComponent";
+import { LoginComponent } from "./LoginComponent";
 import { Tournaments } from "./Tournaments";
 import { Leaderboard } from "./Leaderboard";
 import { Customize } from "./Customize";
@@ -42,9 +42,9 @@ const Header = ({
       maxWidth="360px"
       width="100%"
     >
-      {/* <Flex flex="1.75" justifyContent="flex-start">
+      <Flex flex="1.75" justifyContent="flex-start">
         <LoginComponent />
-      </Flex> */}
+      </Flex>
 
       <Flex flex="1" justifyContent="center">
         <Popover placement="bottom-end">
