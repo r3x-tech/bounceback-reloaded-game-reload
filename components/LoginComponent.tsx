@@ -31,12 +31,12 @@ import { useEffect, useState } from "react";
 import theme from "../styles/theme";
 import userStore from "@/stores/userStore";
 import toast from "react-hot-toast";
-// import { WalletMultiButton } from "@/components/auth/WalletMultiButton";
-// import {
-//   useAnchorWallet,
-//   useConnection,
-//   useWallet,
-// } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@/components/auth/WalletMultiButton";
+import {
+  useAnchorWallet,
+  useConnection,
+  useWallet,
+} from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
 import {
   getPlayersByWalletAddress,
@@ -51,14 +51,15 @@ import { useScoreStore } from "@/stores/useScoreStore";
 import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import { useGameOverModalStore } from "@/stores/useGameOverModalStore";
 import React from "react";
-import { useConnect, useSolana } from "@particle-network/auth-core-modal";
+import {
+  useConnect,
+  useSolana as useParticleSolana,
+} from "@particle-network/auth-core-modal";
 import { UserInfo } from "@particle-network/auth-core";
-import { PublicKey } from "@solana/web3.js";
-// import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-// import { Connection, PublicKey } from "@solana/web3.js";
-// import BaseWalletMultiButton from "./auth/BaseWalletMultiButton";
-// import { useParticle } from "../contexts/ParticleContextProvider";
-// import { UserInfo } from "@particle-network/auth";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { Connection, PublicKey } from "@solana/web3.js";
+import BaseWalletMultiButton from "./auth/BaseWalletMultiButton";
+import { useParticle } from "../contexts/ParticleContextProvider";
 
 const LABELS = {
   "change-wallet": "CHANGE WALLET",
@@ -107,40 +108,44 @@ export const LoginComponent = () => {
     signAllTransactions,
     signAndSendTransaction,
     enable,
-  } = useSolana();
-  const { connect, connected, disconnect } = useConnect();
+  } = useParticleSolana();
+  const {
+    connect: particleConnect,
+    connected: particleConnected,
+    disconnect: particleDisconnect,
+  } = useConnect();
 
-  // const { connection } = useConnection();
-  // const {
-  //   connecting,
-  //   connected,
-  //   disconnect,
-  //   connect,
-  //   publicKey,
-  //   disconnecting,
-  //   wallet,
-  // } = useWallet();
-  // const anchorWallet = useAnchorWallet();
+  const { connection } = useConnection();
+  const {
+    connecting,
+    connected,
+    disconnect,
+    connect,
+    publicKey,
+    disconnecting,
+    wallet,
+  } = useWallet();
+  const anchorWallet = useAnchorWallet();
 
-  // let buttonState: ButtonState["buttonState"];
-  // if (connecting) {
-  //   buttonState = "connecting";
-  //   // console.log("1 - CONNECTING");
-  // } else if (connected) {
-  //   buttonState = "connected";
-  //   // console.log("1 - CONNECTED");
-  // } else if (disconnecting) {
-  //   buttonState = "disconnecting";
-  //   // console.log("1 - DISCONNECTING");
-  // } else if (wallet) {
-  //   buttonState = "has-wallet";
-  //   // console.log("1 - HAS WALLET");
-  // } else {
-  //   buttonState = "no-wallet";
-  //   // console.log("1 - NO WALLET FOUND");
-  // }
+  let buttonState: ButtonState["buttonState"];
+  if (connecting) {
+    buttonState = "connecting";
+    // console.log("1 - CONNECTING");
+  } else if (connected) {
+    buttonState = "connected";
+    // console.log("1 - CONNECTED");
+  } else if (disconnecting) {
+    buttonState = "disconnecting";
+    // console.log("1 - DISCONNECTING");
+  } else if (wallet) {
+    buttonState = "has-wallet";
+    // console.log("1 - HAS WALLET");
+  } else {
+    buttonState = "no-wallet";
+    // console.log("1 - NO WALLET FOUND");
+  }
 
-  // const { setVisible: setModalVisible } = useWalletModal();
+  const { setVisible: setModalVisible } = useWalletModal();
 
   const {
     username,
@@ -160,16 +165,6 @@ export const LoginComponent = () => {
       console.error("Failed to copy address: ", err);
       toast.error("Failed to copy address");
     }
-  };
-
-  const formatUsername = (name: string) => {
-    if (name.length <= 16) {
-      return name;
-    }
-    if (name == "") {
-      return "NA";
-    }
-    return `${name.substring(0, 7)}...${name.substring(name.length - 4)}`;
   };
 
   const formatWalletAddress = (name: string) => {
@@ -197,49 +192,46 @@ export const LoginComponent = () => {
     }
   }, [loggedIn]);
 
-  // useEffect(() => {
-  //   if (publicKey && connected && !loggedIn && !logoutStatus && anchorWallet) {
-  //     // console.log("RUNNING SOLANA LOGIN USE EFFECT");
-  //     fetch("https://api.ipify.org?format=json")
-  //       .then((response) => response.json())
-  //       .then((data) => {
-  //         console.log(data.ip);
-  //         userStore.setState({
-  //           loggedIn: true,
-  //           loginType: "SOLANA",
-  //           username: publicKey.toString(),
-  //           solana_wallet_address: publicKey.toString(),
-  //           currentConnection: connection,
-  //           currentWallet: anchorWallet,
-  //           ip_address: data.ip,
-  //         });
-  //       });
-  //     setLoginInProgress(false);
-  //     if (loadingStatus == true && showGameOverModal == false) {
-  //       setShowLoginModal(false);
-  //       setShowGameOverModal(true);
-  //     }
-  //   }
-  // }, [
-  //   anchorWallet,
-  //   connected,
-  //   connection,
-  //   loadingStatus,
-  //   loggedIn,
-  //   logoutStatus,
-  //   publicKey,
-  //   setShowGameOverModal,
-  //   setShowLoginModal,
-  //   showGameOverModal,
-  //   wallet,
-  // ]);
+  useEffect(() => {
+    if (publicKey && connected && !loggedIn && !logoutStatus && anchorWallet) {
+      fetch("https://api.ipify.org?format=json")
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data.ip);
+          userStore.setState({
+            loggedIn: true,
+            loginType: "SOLANA",
+            username: publicKey.toString(),
+            solana_wallet_address: publicKey.toString(),
+            currentConnection: connection,
+            currentWallet: anchorWallet,
+            ip_address: data.ip,
+          });
+        });
+      setLoginInProgress(false);
+      if (loadingStatus == true && showGameOverModal == false) {
+        setShowLoginModal(false);
+        setShowGameOverModal(true);
+      }
+    }
+  }, [
+    anchorWallet,
+    connected,
+    connection,
+    loadingStatus,
+    loggedIn,
+    logoutStatus,
+    publicKey,
+    setShowGameOverModal,
+    setShowLoginModal,
+    showGameOverModal,
+    wallet,
+  ]);
 
   useEffect(() => {
     const checkAndInsertToDatabase = async () => {
       const entry = await getPlayersByWalletAddress(solana_wallet_address);
       if (!entry) {
-        console.log("RUNNING INSERT TO DB");
-
         await insertPlayerEntry(
           username,
           loginType,
@@ -251,7 +243,6 @@ export const LoginComponent = () => {
       setLoginInProgress(false);
     };
     if (loggedIn && solana_wallet_address.trim() !== "") {
-      console.log("RUNNING DB CHECK");
       checkAndInsertToDatabase();
     }
   }, [ip_address, loggedIn, loginType, solana_wallet_address, username]);
@@ -286,9 +277,7 @@ export const LoginComponent = () => {
   ]);
 
   // const context = useParticle();
-
   // if (!context) {
-  //   // Handle the case where context is not available
   //   return (
   //     <Flex
   //       justifyContent="center"
@@ -317,8 +306,6 @@ export const LoginComponent = () => {
 
   const handlePhoneLogin = async () => {
     setLoginInProgress(true);
-
-    // Remove any dashes from the phone input
     const cleanPhone = phone.replace(/-/g, "");
 
     if (!loggedIn) {
@@ -334,9 +321,8 @@ export const LoginComponent = () => {
           console.log("phone: ", cleanPhone);
           let userInfo: UserInfo | undefined;
 
-          userInfo = await connect({
-            // phone: selectedCountryCode + cleanPhone,
-            // code: '123456', // Uncomment and replace with actual code if you have it
+          userInfo = await particleConnect({
+            phone: selectedCountryCode + cleanPhone,
           });
 
           if (!userInfo && userInfo != undefined) {
@@ -381,46 +367,42 @@ export const LoginComponent = () => {
     }
   };
 
-  // const handleSolanaLogin = async () => {
-  //   setLoginInProgress(true);
+  const handleSolanaLogin = async () => {
+    setLoginInProgress(true);
 
-  //   if (!loggedIn) {
-  //     switch (buttonState) {
-  //       case "no-wallet":
-  //         setModalVisible(true);
-  //         console.log("RAN NO WALLET");
-  //         setLoginInProgress(false);
-  //         break;
-  //       case "has-wallet":
-  //         await connect().catch((error) => {
-  //           // Silently catch because any errors are caught by the context `onError` handler
-  //           console.error("Connect error: ", error);
-  //         });
-  //         if (connect) {
-  //           await connect().catch((error) => {
-  //             // Silently catch because any errors are caught by the context `onError` handler
-  //             console.error("Connect error: ", error);
-  //           });
-  //         }
-  //         break;
-  //       case "connected":
-  //         console.log("BWM connected!!!!");
-  //         setMenuOpen(!menuOpen);
-  //         break;
-  //       case "connecting":
-  //         console.log("BWM connecting!");
-  //         // You can add additional logic here if needed
-  //         break;
-  //       // ... add any additional cases if required
-  //     }
-  //   }
-  // };
+    if (!loggedIn) {
+      switch (buttonState) {
+        case "no-wallet":
+          setModalVisible(true);
+          console.log("RAN NO WALLET");
+          setLoginInProgress(false);
+          break;
+        case "has-wallet":
+          await connect().catch((error) => {
+            console.error("Connect error: ", error);
+          });
+          if (connect) {
+            await connect().catch((error) => {
+              console.error("Connect error: ", error);
+            });
+          }
+          break;
+        case "connected":
+          console.log("BWM connected!!!!");
+          setMenuOpen(!menuOpen);
+          break;
+        case "connecting":
+          console.log("BWM connecting!");
+          break;
+      }
+    }
+  };
 
   const handleLogout = async () => {
     try {
       setLogoutStatus(true);
       if (connected && loggedIn) {
-        await disconnect().then(() => {
+        await particleDisconnect().then(() => {
           console.log("logout");
         });
         userStore.setState({
@@ -433,11 +415,9 @@ export const LoginComponent = () => {
         setLogoutStatus(false);
         // setIsOpen(false);
         // router.push("/");
-      }
-      // else if (connected && loginType == "SOLANA") {
-      //   await disconnect;
-      // }
-      else {
+      } else if (connected && loginType == "SOLANA") {
+        disconnect;
+      } else {
         toast.error("Failed to logout! 0x1");
         return;
       }
@@ -808,7 +788,7 @@ export const LoginComponent = () => {
                   LOGIN W/ GOOGLE
                 </Button> */}
 
-                {/* <Button
+                <Button
                   leftIcon={
                     <Image
                       src="/solLogo.svg" // Path to Solana logo
@@ -849,7 +829,7 @@ export const LoginComponent = () => {
                   }}
                 >
                   LOGIN W/ SOLANA
-                </Button> */}
+                </Button>
 
                 {/* <BaseWalletMultiButton
                   startIcon={
