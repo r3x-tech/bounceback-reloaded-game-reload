@@ -106,7 +106,7 @@ const Header = ({
           </PopoverContent>
         </Popover>
       </Flex>
-      <Flex flex="1.25" justifyContent="flex-end">
+      {/* <Flex flex="1.25" justifyContent="flex-end">
         <Popover placement="bottom-end">
           <PopoverTrigger>
             <Box cursor="pointer">
@@ -134,7 +134,7 @@ const Header = ({
             <Tournaments />
           </PopoverContent>
         </Popover>
-      </Flex>
+      </Flex> */}
     </Flex>
   </Flex>
 );

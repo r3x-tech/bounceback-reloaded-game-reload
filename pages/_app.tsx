@@ -9,14 +9,40 @@ import { Toaster } from "react-hot-toast";
 import Router from "next/router";
 import withGA from "next-ga";
 import { Analytics } from "@vercel/analytics/react";
-import { ParticleProvider } from "@/contexts/ParticleProvider";
+// import { ParticleProvider } from "@/contexts/ParticleProvider";
+import {
+  AuthCoreContextProvider,
+  PromptSettingType,
+} from "@particle-network/auth-core-modal";
+import { Solana } from "@particle-network/chains";
+import { AuthType } from "@particle-network/auth-core";
 
 const queryClient = new QueryClient();
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     // <SolanaProvider>
-    <ParticleProvider>
+    <AuthCoreContextProvider
+      options={{
+        projectId: process.env.NEXT_PUBLIC_PROJECT_ID!,
+        clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY!,
+        appId: process.env.NEXT_PUBLIC_APP_ID!,
+        authTypes: [AuthType.phone],
+        themeType: "dark",
+        fiatCoin: "USD",
+        language: "en",
+        promptSettingConfig: {
+          promptPaymentPasswordSettingWhenSign: PromptSettingType.first,
+          promptMasterPasswordSettingWhenLogin: PromptSettingType.first,
+        },
+        wallet: {
+          visible: false,
+          customStyle: {
+            supportChains: [Solana],
+          },
+        },
+      }}
+    >
       <ChakraProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <Component {...pageProps} />
@@ -24,7 +50,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           <Toaster />
         </QueryClientProvider>
       </ChakraProvider>
-    </ParticleProvider>
+    </AuthCoreContextProvider>
     // </SolanaProvider>
   );
 }

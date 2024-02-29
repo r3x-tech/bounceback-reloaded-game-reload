@@ -335,7 +335,7 @@ export const LoginComponent = () => {
           let userInfo: UserInfo | undefined;
 
           userInfo = await connect({
-            phone: selectedCountryCode + cleanPhone,
+            // phone: selectedCountryCode + cleanPhone,
             // code: '123456', // Uncomment and replace with actual code if you have it
           });
 
